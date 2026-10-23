@@ -54,7 +54,17 @@ button{transition:transform .12s,filter .15s;background:linear-gradient(180deg,#
 .lk{background:#2a1a4a;border:1px solid #ff2d9a55;border-radius:12px;padding:8px;display:grid;gap:6px}.lk input{flex:2;min-width:0}#ad details{font-size:12px;color:var(--m)}
 #ad.full{top:0;left:0;right:0;bottom:0;max-height:none;border-radius:0;padding-top:calc(10px + env(safe-area-inset-top,0px));align-content:start;overflow:auto;width:auto}#ad.full #vd{max-height:52vh}
 #ad.mini #ah b,#ad.mini #stp,#ad.mini details,#ad.mini .lk{display:none}#ad.mini #ah{justify-content:flex-end}
+#hx{position:fixed;inset:0;z-index:30;background:radial-gradient(900px 500px at 50% -10%,#3a1466 0,transparent 60%),radial-gradient(700px 500px at 100% 100%,#0c2c6b 0,transparent 55%),var(--bg)}
+#c3{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#hu{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;padding:env(safe-area-inset-top,0px) 8px calc(8px + env(safe-area-inset-bottom,0px));overflow:auto}
+#hu button,#hu select,#hu input,#hu .hc{pointer-events:auto}.hb{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:6px 0;pointer-events:none}.hb>*{pointer-events:auto}.hb b{font-size:18px}.hb button,.hb select{min-height:40px}
+.ht{text-align:center;color:var(--m);pointer-events:none;font-size:13px;padding:0 10px}.hc{background:#0b1030cc;border:1px solid #ffffff22;border-radius:14px;padding:10px;display:grid;gap:6px;max-height:46vh;overflow:auto;backdrop-filter:blur(8px)}
+.hb button.big{flex:1;min-height:56px;font-size:17px}
+.rm{position:relative;width:min(300px,84vw);height:min(300px,84vw);margin:auto}.rh{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;z-index:2;font-size:26px;padding:0;background:linear-gradient(135deg,var(--mag),#7a2dff);border:0;box-shadow:0 6px 24px -6px var(--mag)}
+.ri{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:20px;line-height:1;padding:0;transform:scale(.2);opacity:0;pointer-events:none;transition:transform .38s cubic-bezier(.2,1.4,.4,1),opacity .25s;background:linear-gradient(180deg,#232c6b,#171d4a);border:1px solid #ffffff33;cursor:pointer;color:var(--t)}.ri small{font-size:9px}
+.rm.o .ri{transform:translate(var(--x),var(--y)) scale(1);opacity:1;pointer-events:auto}#ad.mini .rm,#ad.mini .cg{display:none}.cg small{display:block;line-height:1.35}
 </style></head><body>
+<div id="hx" hidden><canvas id="c3" aria-label="3D arena"></canvas><div id="hu"></div></div>
 <div id="s" hidden></div>
 <div id="g" hidden>
 <div id="top"><b id="info"></b><span><button onclick="AB=1;openAn()" aria-label="Analytics">📊</button> <button id="mn" aria-label="Back to menu">☰ Menu</button></span></div>
@@ -68,9 +78,9 @@ button{transition:transform .12s,filter .15s;background:linear-gradient(180deg,#
 <div id="ad" hidden role="dialog" aria-label="AutoDart camera"><div id="ah"><b>📷 AutoDart</b><span id="stp"><i>1 Camera</i><i>2 Calibrate</i><i>3 Play</i></span><span class="bt3"><button onclick="adMini()" aria-label="Minimise">▁</button><button onclick="adFull()" aria-label="Expand to full screen">⤢</button><button onclick="camStop()" aria-label="Close camera">✕</button></span></div>
 <div id="av"><video id="vd" playsinline muted></video><canvas id="vo" aria-label="Camera overlay. Tap to calibrate."></canvas></div><div id="ast" role="status">Camera off.</div>
 <div id="alk" class="lk" hidden><small>Camera is blocked inside this embedded view. Open this link in Safari:</small><div class="kr"><input id="alu" readonly aria-label="Page link"><button onclick="copyLink()">Copy / share</button><button onclick="openFull()">Open tab</button></div></div>
-<div class="kr ch"><button id="a1" class="pri" onclick="camStart()">Start camera</button><button onclick="camFlip()">Flip</button><button onclick="calStart()">Calibrate</button><button onclick="RB=1;AST='wait';stab=0">Re-baseline</button><button onclick="miss()">Confirm miss</button></div>
-<div class="kr ch"><label class="fl">🎞 Analyse a video<input id="vf" type="file" accept="video/*" hidden></label><button onclick="vp()" aria-label="Play or pause video">▶/⏸</button><select id="am" aria-label="AutoDart mode"><option value="c">Conservative</option><option value="b">Balanced</option><option value="a">Automatic</option></select></div>
-<details><summary>Camera help (iPhone)</summary><small>Use Safari, not an in-app browser. Settings > Safari > Camera: Ask. The page must be on HTTPS and opened on its own (not embedded). Mount the phone still with the whole board in view and steady light, then calibrate. Share > Add to Home Screen gives a full-screen app.</small></details>
+<div id="rm" class="rm o" role="menu" aria-label="Camera radial menu"></div><select id="am" hidden><option value="c">Conservative</option><option value="b">Balanced</option><option value="a">Automatic</option></select><input id="vf" type="file" accept="video/*" hidden><button id="a1" hidden></button>
+<details class="cg" open><summary>Calibration modes</summary><small><b>Auto:</b> finds the red and green rings in the picture, fits an ellipse for the board plane, then you tap the 20 segment once. Fast but approximate (it ignores strong perspective). Needs good light, the whole board in frame and no other red or green objects. Always check the overlay.<br><b>Manual:</b> you tap four reference wires on the outer double ring (20|1, 6|10, 3|19, 11|14) and then the bull. This builds an exact perspective mapping and reports the error in mm. Slower, most accurate.<br>Recalibrate whenever the phone or board moves.</small></details>
+<details><summary>Camera help (iPhone)</summary><small>Use Safari, not an in-app browser. Settings > Safari > Camera: Ask. The page must be on HTTPS and opened on its own (not embedded). Mount the phone still with the whole board in view and steady light. Share > Add to Home Screen gives a full-screen app.</small></details>
 <div id="acf" hidden><canvas id="cc" width="160" height="120"></canvas><div><b id="apr"></b><div class="kr ch"><button class="pri" onclick="cfm(1)">Confirm</button><button onclick="cfm(2)">Correct</button><button onclick="cfm(3)">Miss</button><button onclick="cfm(0)">Reject</button></div></div></div></div><div id="ov" hidden></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -123,6 +133,40 @@ function routesN(sc,k,out,lim=3){const F=d=>out==0||(out==1&&d.m==2)||(out==2&&d
 if(sc>0){(fin[sc]||[]).forEach(f=>add([f]));if(k>=2)DL.forEach(a=>{if(sc-a.p>0)(fin[sc-a.p]||[]).forEach(f=>add([a,f]))});if(k>=3)DL.forEach(a=>DL.forEach(b=>{const r=sc-a.p-b.p;if(r>0)(fin[r]||[]).forEach(f=>add([a,b,f]))}))}
 R.sort((x,y)=>x.c-y.c);const seen=new Set,o=[];for(const x of R){const key=x.r.slice(0,-1).map(dn).sort().join()+'>'+dn(x.r[x.r.length-1]);if(seen.has(key))continue;seen.add(key);o.push(x.r);if(o.length>=lim)break}return o}
 function setupR(sc,k,out){const C=[];DL.forEach(d=>{const r=sc-d.p;if(r<=(out?1:0))return;let nr=k>=2?routesN(r,k-1,out,1)[0]:null,nx=0;if(!nr){nr=routesN(r,3,out,1)[0];nx=1}if(!nr)return;C.push({d,r,nr,nx,c:spen(d)*3-d.p/4+fpen(nr[nr.length-1],out)*2+(nx?30:0)+nr.length*20})});C.sort((a,b)=>a.c-b.c);return C[0]||null}
+//CHESS
+const CP=[0,100,320,330,500,900,0],CN=[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]],CK=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+function cfen(f){const[p,s,c,e,h]=f.split(' '),b=Array(64).fill(0);let i=0;for(const ch of p){if(ch=='/')continue;if(/\d/.test(ch)){i+=+ch;continue}const t='pnbrqk'.indexOf(ch.toLowerCase())+1;b[i++]=ch==ch.toLowerCase()?-t:t}
+return{b,side:s=='w'?1:-1,cast:(c.includes('K')?1:0)|(c.includes('Q')?2:0)|(c.includes('k')?4:0)|(c.includes('q')?8:0),ep:e=='-'?-1:(8-+e[1])*8+(e.charCodeAt(0)-97),half:+(h||0)}}
+const cinit=()=>cfen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'),cl=t=>({b:t.b.slice(),side:t.side,cast:t.cast,ep:t.ep,half:t.half});
+function catt(b,s,by){const r=s>>3,f=s&7,pr=r+by;for(const df of[-1,1]){const ff=f+df;if(pr>=0&&pr<8&&ff>=0&&ff<8&&b[pr*8+ff]==by)return true}
+for(const[dr,df]of CN){const rr=r+dr,ff=f+df;if(rr>=0&&rr<8&&ff>=0&&ff<8&&b[rr*8+ff]==by*2)return true}
+for(const[dr,df]of CK){const rr=r+dr,ff=f+df;if(rr>=0&&rr<8&&ff>=0&&ff<8&&b[rr*8+ff]==by*6)return true}
+for(const[dr,df]of CK){let rr=r+dr,ff=f+df;while(rr>=0&&rr<8&&ff>=0&&ff<8){const p=b[rr*8+ff];if(p){const a=p*by;if(a>0&&(a==5||(dr&&df?a==3:a==4)))return true;break}rr+=dr;ff+=df}}return false}
+function cgen(st){const b=st.b,sd=st.side,M=[];for(let s=0;s<64;s++){const p=b[s];if(p*sd<=0)continue;const t=Math.abs(p),r=s>>3,f=s&7;
+if(t==1){const dr=-sd,sr=sd==1?6:1,pr=sd==1?0:7,r1=r+dr,add=(to,cap,ep)=>{if((to>>3)==pr)for(const q of[5,4,3,2])M.push({f:s,t:to,p:q*sd,c:cap});else M.push({f:s,t:to,c:cap,ep})};
+if(r1>=0&&r1<8){if(b[r1*8+f]==0){add(r1*8+f,0);if(r==sr&&b[(r+2*dr)*8+f]==0)M.push({f:s,t:(r+2*dr)*8+f,dp:1})}
+for(const df of[-1,1]){const ff=f+df;if(ff<0||ff>7)continue;const to=r1*8+ff;if(b[to]*sd<0)add(to,1);else if(to==st.ep)add(to,1,1)}}}
+else if(t==2||t==6){for(const[dr,df]of(t==2?CN:CK)){const rr=r+dr,ff=f+df;if(rr<0||rr>7||ff<0||ff>7)continue;const to=rr*8+ff;if(b[to]*sd<=0)M.push({f:s,t:to,c:b[to]!=0})}
+if(t==6){const h=sd==1?60:4,kb=sd==1?1:4,qb=sd==1?2:8;if(s==h&&!catt(b,h,-sd)){if((st.cast&kb)&&!b[h+1]&&!b[h+2]&&b[h+3]==4*sd&&!catt(b,h+1,-sd))M.push({f:h,t:h+2,cs:1});if((st.cast&qb)&&!b[h-1]&&!b[h-2]&&!b[h-3]&&b[h-4]==4*sd&&!catt(b,h-1,-sd))M.push({f:h,t:h-2,cs:2})}}}
+else{for(const[dr,df]of CK){if(t==3&&!(dr&&df))continue;if(t==4&&dr&&df)continue;let rr=r+dr,ff=f+df;while(rr>=0&&rr<8&&ff>=0&&ff<8){const to=rr*8+ff,q=b[to];if(q*sd>0)break;M.push({f:s,t:to,c:q!=0});if(q)break;rr+=dr;ff+=df}}}}return M}
+function cmake(st,m){const b=st.b,p=b[m.f],u={cap:b[m.t],cast:st.cast,ep:st.ep,half:st.half,epc:0,m};b[m.t]=m.p||p;b[m.f]=0;
+if(m.ep){const cs=m.t+(st.side==1?8:-8);u.epc=b[cs];b[cs]=0}
+if(m.cs==1){b[m.t-1]=b[m.t+1];b[m.t+1]=0}else if(m.cs==2){b[m.t+1]=b[m.t-2];b[m.t-2]=0}
+const rm=q=>{if(q==60)st.cast&=~3;else if(q==4)st.cast&=~12;else if(q==63)st.cast&=~1;else if(q==56)st.cast&=~2;else if(q==7)st.cast&=~4;else if(q==0)st.cast&=~8};rm(m.f);rm(m.t);
+st.ep=m.dp?m.f+(st.side==1?-8:8):-1;st.half=(Math.abs(p)==1||u.cap)?0:st.half+1;st.side=-st.side;return u}
+function cunmake(st,u){const m=u.m,b=st.b;st.side=-st.side;b[m.f]=m.p?st.side:b[m.t];b[m.t]=u.cap;if(m.ep)b[m.t+(st.side==1?8:-8)]=u.epc;
+if(m.cs==1){b[m.t+1]=b[m.t-1];b[m.t-1]=0}else if(m.cs==2){b[m.t-2]=b[m.t+1];b[m.t+1]=0}st.cast=u.cast;st.ep=u.ep;st.half=u.half}
+function clegal(st){const o=[];for(const m of cgen(st)){const u=cmake(st,m),k=st.b.indexOf(-st.side*6);if(!catt(st.b,k,st.side))o.push(m);cunmake(st,u)}return o}
+function perft(st,d){if(!d)return 1;let n=0;for(const m of clegal(st)){const u=cmake(st,m);n+=perft(st,d-1);cunmake(st,u)}return n}
+function cstat(st){const ms=clegal(st),k=st.b.indexOf(st.side*6),chk=catt(st.b,k,-st.side);if(!ms.length)return{end:1,why:chk?'mate':'stale',chk};if(st.half>=100)return{end:1,why:'50',chk};const pcs=st.b.filter(p=>p&&Math.abs(p)!=6);if(!pcs.length||(pcs.length==1&&[2,3].includes(Math.abs(pcs[0]))))return{end:1,why:'insuf',chk};return{end:0,chk}}
+function ceval(st){let s=0;const b=st.b;for(let i=0;i<64;i++){const p=b[i];if(!p)continue;const t=Math.abs(p),sg=p>0?1:-1,r=i>>3,f=i&7,c=Math.max(Math.abs(r-3.5),Math.abs(f-3.5));let v=CP[t];if(t==1)v+=(sg==1?6-r:r-1)*7+(3.5-Math.abs(f-3.5))*3;else if(t==2||t==3)v+=(3.5-c)*9;else if(t==5)v+=(3.5-c)*2;s+=sg*v}return s}
+const cord=(st,ms)=>{const b=st.b,k=m=>(b[m.t]?Math.abs(b[m.t])*10-Math.abs(b[m.f]):0)+(m.p?50:0);return ms.sort((x,y)=>k(y)-k(x))};
+function cq(st,a,b,q){const s0=st.side*ceval(st);if(q<=0||s0>=b)return s0;if(s0>a)a=s0;for(const m of cord(st,cgen(st).filter(m=>m.c))){const u=cmake(st,m),k=st.b.indexOf(-st.side*6);if(catt(st.b,k,st.side)){cunmake(st,u);continue}const v=-cq(st,-b,-a,q-1);cunmake(st,u);if(v>=b)return v;if(v>a)a=v}return a}
+function cneg(st,d,a,b,ply){if(d==0)return cq(st,a,b,4);const ms=cord(st,clegal(st));if(!ms.length){const k=st.b.indexOf(st.side*6);return catt(st.b,k,-st.side)?-99000+ply:0}let best=-1e9;for(const m of ms){const u=cmake(st,m),v=-cneg(st,d-1,-b,-a,ply+1);cunmake(st,u);if(v>best)best=v;if(v>a)a=v;if(a>=b)break}return best}
+function cbest(st,d,rnd){const ms=cord(st,clegal(st));if(!ms.length)return null;let best=null,bv=-1e9;for(const m of ms){const u=cmake(st,m);let v=-cneg(st,d-1,-1e9,1e9,1);cunmake(st,u);v+=rnd?Math.random()*rnd:0;if(v>bv){bv=v;best=m}}return{m:best,v:bv}}
+//ENDCHESS
+/* auto-calibration geometry: ellipse (centre, axes, semi-axes) + one tap on the 20 -> 4 image points for the homography */
+function autoPts(A,p){const px=p[0]-A.mx,py=p[1]-A.my,u=(px*A.U[0]+py*A.U[1])/A.a,v=(px*A.V[0]+py*A.V[1])/A.b,ph=Math.atan2(v,u);return[9,99,189,279].map(t=>{const f=ph+t*Math.PI/180;return[A.mx+A.U[0]*A.a*Math.cos(f)+A.V[0]*A.b*Math.sin(f),A.my+A.U[1]*A.a*Math.cos(f)+A.V[1]*A.b*Math.sin(f)]})}
 /* ===== Self-tests (pure engine + board hit mapping) ===== */
 function selfTest(){const r=[],ok=(n,c)=>r.push([n,!!c]);
 const mk=(o={},n=2)=>{const s=o.start||501,e=o.inR?0:1;return{id:'t',cfg:{start:s,inR:0,outR:1,legs:1,...o},players:[...Array(n)].map((_,i)=>({n:'P'+i,c:'#fff',score:s,entered:e,legs:0,pts:0,darts:0,hi:0,t180:0})),cur:0,starter:0,leg:1,visit:[],vs:{score:s,entered:e},pend:null,over:0,events:[]}};
@@ -159,7 +203,16 @@ const RN=(s,k,o,l)=>routesN(s,k,o,l).map(r=>r.map(dn).join(' '));
 ok('assistant: 170 = T20 T20 BULL',RN(170,3,1)[0]=='T20 T20 BULL');ok('assistant: 40 = D20',RN(40,3,1)[0]=='D20');ok('assistant: 32 = D16',RN(32,3,1)[0]=='D16');ok('assistant: 100 in 2 darts = T20 D20',RN(100,2,1)[0]=='T20 D20');
 ok('assistant: 1 left cannot finish on double out',RN(1,3,1).length==0);ok('assistant: straight out 1 = S1',RN(1,3,0)[0]=='S1');ok('assistant: master out 60 = T20',RN(60,1,2)[0]=='T20');ok('assistant: no 169 finish',RN(169,3,1).length==0);
 ok('assistant: alternatives are distinct',new Set(RN(100,3,1,3)).size==RN(100,3,1,3).length&&RN(100,3,1,3).length==3);ok('assistant: setup exists above 170',!!setupR(200,3,1));
-const s41=setupR(41,1,1);ok('assistant: 41 with one dart leaves a one-dart finish',s41&&s41.nr.length==1);return r}
+const s41=setupR(41,1,1);ok('assistant: 41 with one dart leaves a one-dart finish',s41&&s41.nr.length==1);
+const pf=(f,d)=>perft(cfen(f),d),SP='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+ok('chess perft start d1-3 (20/400/8902)',pf(SP,1)==20&&pf(SP,2)==400&&pf(SP,3)==8902);
+ok('chess perft kiwipete d1-2 (castling, pins)',pf('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1',1)==48&&pf('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1',2)==2039);
+ok('chess perft pos3 d3 (en passant, evasions)',pf('8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1',3)==2812);
+ok('chess perft pos4 d3 (promotions)',pf('r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1',3)==9467);
+const mm=cbest(cfen('6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1'),2,0);ok('chess search finds back-rank mate',mm&&mm.m.f==56&&mm.m.t==0);
+ok('chess detects checkmate and stalemate',cstat(cfen('7k/5Q2/6K1/8/8/8/8/8 b - - 0 1')).why=='stale'&&cstat(cfen('R5k1/5ppp/8/8/8/8/8/6K1 b - - 0 1')).why=='mate');
+const AA={mx:320,my:180,U:[Math.cos(.3),Math.sin(.3)],V:[-Math.sin(.3),Math.cos(.3)],a:200,b:120},tru=(x,y)=>{const rr=Math.hypot(x,y)/170,f=1.1+Math.atan2(x,y);return[AA.mx+rr*(AA.U[0]*AA.a*Math.cos(f)+AA.V[0]*AA.b*Math.sin(f)),AA.my+rr*(AA.U[1]*AA.a*Math.cos(f)+AA.V[1]*AA.b*Math.sin(f))]};
+const apH=homog(CALPTS,autoPts(AA,tru(0,100))),pq=hap(apH,50,-70),tq=tru(50,-70);ok('auto-calibration: ellipse + tap on 20 reproduces the board mapping',Math.hypot(pq[0]-tq[0],pq[1]-tq[1])<1e-6);return r}
 function rt(){const r=selfTest(),f=r.filter(x=>!x[1]);$('#tr').innerHTML=(r.length-f.length)+'/'+r.length+' tests passed'+f.map(x=>'<div>✗ '+esc(x[0])+'</div>').join('')}
 /* ===== State, persistence ===== */
 const K='dartscope-g',$=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
@@ -181,7 +234,7 @@ let tt;function toast(t,c){const e=$('#toast');e.textContent=t;e.style.color=c;e
 const HINT=['Straight: no restriction.','Double: must start with a double.','Master: start with a double, treble or bull.'],HO=['Straight out: reaching exactly 0 wins.','Double out: finish on a double or bull. Passing 0, or leaving 1, is a bust.','Master out: finish on a double, treble or bull. Leaving 1 is a bust.'];
 function sv(){const sel=(id,o,v)=>`<select id="${id}" onchange="cf('${id}',this.value)">${o.map(([a,b])=>`<option value="${a}"${a==v?' selected':''}>${b}</option>`).join('')}</select>`;
 let h='';try{h=JSON.parse(localStorage.getItem('dartscope-hist')||'[]').slice(-5).reverse().map(x=>`<div class="m">${x.d} · ${x.m} · won by ${esc(x.w)}</div>`).join('')}catch(e){}
-$('#s').innerHTML=`<h1>Dart<i>Scope</i></h1>${G&&!G.over?'<button class="pri" onclick="go()">▶ Resume match</button>':''}
+$('#s').innerHTML=`<button onclick="goHome()">🏠 Home</button><h1>Dart<i>Scope</i></h1>${G&&!G.over?'<button class="pri" onclick="go()">▶ Resume match</button>':''}
 <b>Players (${names.length}/8)</b>${names.map((n,i)=>`<div class="pn"><input value="${esc(n)}" maxlength="14" aria-label="Player ${i+1} name" oninput="names[${i}]=this.value"><button onclick="rm(${i})" ${names.length<2?'disabled':''} aria-label="Remove">✕</button></div>`).join('')}
 <button onclick="add()" ${names.length>=8?'disabled':''}>+ Add player</button>
 <div class="g2">${sel('start',[301,501,701,901,1001].map(v=>[v,v]),C.start)}${sel('legs',[1,2,3,4,5,7].map(v=>[v,'First to '+v]),C.legs)}${sel('inR',[[0,'Straight in'],[1,'Double in'],[2,'Master in']],C.inR)}${sel('outR',[[0,'Straight out'],[1,'Double out'],[2,'Master out']],C.outR)}</div>
@@ -306,7 +359,7 @@ await new Promise(r=>vd.videoWidth?r():vd.onloadedmetadata=r);PH=Math.round(PW*v
 vd.onresize=()=>{if(CS&&vd.videoWidth){PH=Math.round(PW*vd.videoHeight/vd.videoWidth);pc.width=vo.width=PW;pc.height=vo.height=PH;GR=PG=BL=null;calStart();adS('Camera orientation changed. Recalibrate: '+CM[0])}};
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&CS&&CS.getVideoTracks()[0].readyState=='ended'){adS('Camera was interrupted. Tap Start camera.');camHalt()}});
 function calStart(){CALP=[];CALOK=false;calOn=true;CH=Hi=null;AST='cal';RI=null;drawOv()}
-vo.addEventListener('pointerup',e=>{if(!calOn)return;const r=vo.getBoundingClientRect();CALP.push([(e.clientX-r.left)/r.width*PW,(e.clientY-r.top)/r.height*PH]);
+vo.addEventListener('pointerup',e=>{if(!calOn)return;const r=vo.getBoundingClientRect();if(AUP)return autoFinish(e,r);CALP.push([(e.clientX-r.left)/r.width*PW,(e.clientY-r.top)/r.height*PH]);
 if(CALP.length==4){CH=homog(CALPTS,CALP);Hi=CH&&hinv(CH);if(!Hi){CALP=[];CH=null;adS('Those points do not form a valid board plane. Try again: '+CM[0]);return drawOv()}}
 if(CALP.length==5){const[bx,by]=hap(Hi,...CALP[4]);CQ=Math.hypot(bx,by);calOn=false;CALOK=CQ<=5;const dm=Math.hypot(...hap(CH,B.dout,0).map((v,i)=>v-hap(CH,-B.dout,0)[i])),mpp=2*B.dout/dm;
 if(CALOK){RI=[];for(let y=0;y<PH;y++)for(let x=0;x<PW;x++){const[a,b]=hap(Hi,x,y);if(Math.hypot(a,b)<=B.dout+25)RI.push(y*PW+x)}RI=Uint32Array.from(RI);PG=BL=null;RB=1;stab=0;AST='wait'}
@@ -364,6 +417,136 @@ el.innerHTML=h;el.hidden=!h;
 const ct=FA?ts.map((d,i)=>({n:d.n,m:d.m,i:alt?'•':i+1,c:['#ffd54a','#34e08a','#ff5ac8'][alt?0:i]})):[];HLon=ct.length>0&&!AN;hlDraw(HLon?ct:[]);if(HL)HL.visible=HLon;if(two)d2()}
 $('#hb').onclick=()=>{FA=FA?0:1;try{localStorage.setItem('dartscope-fa',FA)}catch(e){}$('#hb').classList.toggle('on',!!FA);if(G)ui()};$('#hb').classList.toggle('on',!!FA);
 $('#chk').onclick=()=>{if(RS.length>1){FI=(FI+1)%RS.length;if(G)ui()}};
+/* ===== Radial camera menu + auto calibration ===== */
+const RMI=[['▶','Start','camStart()'],['🔄','Flip','camFlip()'],['✨','Auto','calAuto()'],['✋','Manual','calStart()'],['🎞','Video',"$('#vf').click()"],['⚙','Mode','adMode()'],['🎯','Miss','miss()'],['⟳','Rebase',"RB=1;AST='wait';stab=0"],['⤢','Full','adFull()']];
+let AUP=null;
+function rmT(){$('#rm').classList.toggle('o')}
+function rmBuild(){const n=RMI.length;$('#rm').innerHTML='<button class="rh" onclick="rmT()" aria-label="Camera menu">📷</button>'+RMI.map(([i,t,f],k)=>{const a=k*2*Math.PI/n;return `<button class="ri" style="--x:${(Math.sin(a)*112).toFixed(0)}px;--y:${(-Math.cos(a)*112).toFixed(0)}px" onclick="${f}" aria-label="${t}">${i}<small>${t}</small></button>`}).join('')}
+function adMode(){AM=AM=='c'?'b':AM=='b'?'a':'c';$('#am').value=AM;try{localStorage.setItem('dartscope-am',AM)}catch(e){}adS('Mode: '+({c:'Conservative (always confirm)',b:'Balanced',a:'Automatic'})[AM])}
+function calAuto(){if(!CS&&!VF)return adS('Start the camera (or load a video) first.');calStart();pcx.drawImage(vd,0,0,PW,PH);const d=pcx.getImageData(0,0,PW,PH).data,P=[];
+for(let y=0;y<PH;y+=2)for(let x=0;x<PW;x+=2){const i=(y*PW+x)*4,r=d[i],g=d[i+1],b=d[i+2];if((r>90&&r>g*1.6&&r>b*1.6)||(g>80&&g>r*1.35&&g>b*1.2))P.push(x,y)}
+const n=P.length/2;if(n<600)return adS('Auto calibration could not find enough red and green ring pixels ('+n+'). Improve the light, move closer, or use Manual.');
+let mx=0,my=0;for(let i=0;i<P.length;i+=2){mx+=P[i];my+=P[i+1]}mx/=n;my/=n;let a=0,b=0,c=0;for(let i=0;i<P.length;i+=2){const x=P[i]-mx,y=P[i+1]-my;a+=x*x;b+=x*y;c+=y*y}
+const th=.5*Math.atan2(2*b,a-c),U=[Math.cos(th),Math.sin(th)],V=[-Math.sin(th),Math.cos(th)],pu=[],pv=[];for(let i=0;i<P.length;i+=2){const x=P[i]-mx,y=P[i+1]-my;pu.push(Math.abs(x*U[0]+y*U[1]));pv.push(Math.abs(x*V[0]+y*V[1]))}
+pu.sort((p,q)=>p-q);pv.sort((p,q)=>p-q);const A={mx,my,U,V,a:pu[Math.floor(n*.98)],b:pv[Math.floor(n*.98)]},ratio=A.b/A.a;
+if(!(ratio>.3&&ratio<=1.05)||A.a<40){drawOv();return adS('Auto calibration found an implausible shape (ratio '+ratio.toFixed(2)+'). Make sure only the board is red and green in view, or use Manual.')}
+AUP={...A,P};calOn=true;drawOv();const oc=vo.getContext('2d');oc.strokeStyle='#ffb12d';oc.lineWidth=2;oc.beginPath();for(let k=0;k<=72;k++){const f=k*Math.PI/36,x=mx+U[0]*A.a*Math.cos(f)+V[0]*A.b*Math.sin(f),y=my+U[1]*A.a*Math.cos(f)+V[1]*A.b*Math.sin(f);k?oc.lineTo(x,y):oc.moveTo(x,y)}oc.stroke();
+adS('Auto: board ellipse found (tilt ratio '+ratio.toFixed(2)+'). Now tap the number 20 segment (top of the dartboard).')}
+function autoFinish(e,r){const A=AUP;AUP=null;const pts=autoPts(A,[(e.clientX-r.left)/r.width*PW,(e.clientY-r.top)/r.height*PH]);CALP=pts;CH=homog(CALPTS,pts);Hi=CH&&hinv(CH);
+if(!Hi){CALP=[];CH=null;drawOv();return adS('Auto calibration failed. Use Manual.')}
+const[cx,cy]=hap(CH,0,0),R0=.11*Math.min(A.a,A.b);let sx=0,sy=0,k=0;for(let i=0;i<A.P.length;i+=2){if(Math.hypot(A.P[i]-cx,A.P[i+1]-cy)<=R0){sx+=A.P[i];sy+=A.P[i+1];k++}}
+let note;if(k>=15){const[bx,by]=hap(Hi,sx/k,sy/k);CQ=Math.hypot(bx,by);note='bull check: '+CQ.toFixed(1)+' mm off'}else{CQ=4.5;note='bull not verified (check the overlay yourself)'}
+const dm=Math.hypot(...hap(CH,B.dout,0).map((v,i)=>v-hap(CH,-B.dout,0)[i])),mpp=2*B.dout/dm;calOn=false;CALOK=CQ<=5;
+if(CALOK){RI=[];for(let y=0;y<PH;y++)for(let x=0;x<PW;x++){const[p,q]=hap(Hi,x,y);if(Math.hypot(p,q)<=B.dout+25)RI.push(y*PW+x)}RI=Uint32Array.from(RI);PG=BL=null;RB=1;stab=0;AST='wait'}
+drawOv();adS('Auto calibration: '+note+', \u2248'+mpp.toFixed(2)+' mm per pixel (approximate ellipse fit).'+(CALOK?' Verify the green rings sit on the real rings; if not, use Manual.':' Too inaccurate: use Manual.'))}
+rmBuild();
+
+/* ===== Arena: home scene, chess 3D, analysis, profile ===== */
+let R2=null,CAM2=null,RC2=null,SHm=null,SCh=null,SAn=null,scn=null,MWm=null,MBm=null,hd=null,hc=null,HCX=null,CX=null,CHG=null,HLG=null,BARS=[],BT=0,CHW=10,AZ=0,EL=.95,DS=11.5,cst=null,hist2=[],LM=[],sel=-1,lm=null,hintMv=null,busy=0,gameOver=0,evl=[],mvl=[],botLv=1,hNext=0,hSi=0,hdD=[],hcT=0,ANIM=[],PART=[],HPT=0,HPW='',dg0=null,dgm=0,PRF={name:'Player',color:'#ff2d9a',games:[]};
+const c3=$('#c3'),hu=$('#hu'),SQ=q=>[(q&7)-3.5,(q>>3)-3.5],fsq=q=>'abcdefgh'[q&7]+(8-(q>>3)),tls=T=>T.map(([a,v,d,b])=>`<div class="tl"><small>${a}</small><b class="cu" data-v="${v}" data-d="${d}">0</b><small>${b}</small></div>`).join('');
+try{const p=JSON.parse(localStorage.getItem('dartscope-prof')||'null');if(p&&Array.isArray(p.games))PRF=p}catch(e){}
+const prfSave=()=>{try{localStorage.setItem('dartscope-prof',JSON.stringify(PRF))}catch(e){}};
+const lathe=a=>new THREE.LatheGeometry(a.map(p=>new THREE.Vector2(p[0],p[1])),32);
+function mkPiece(t,sd){const g=new THREE.Group(),m=sd>0?MWm:MBm,add=(geo,x=0,y=0,z=0)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.castShadow=true;g.add(o);return o};
+const L={1:[[0,0],[.34,0],[.36,.07],[.28,.13],[.17,.2],[.12,.34],[.19,.42],[.1,.46]],2:[[0,0],[.36,0],[.38,.07],[.3,.14],[.22,.22],[.2,.3],[0,.32]],3:[[0,0],[.36,0],[.38,.07],[.28,.14],[.14,.28],[.11,.5],[.22,.6],[.25,.74],[.17,.9],[.04,.98]],4:[[0,0],[.38,0],[.4,.07],[.3,.15],[.24,.3],[.22,.55],[.3,.62],[.31,.74],[0,.74]],5:[[0,0],[.4,0],[.42,.07],[.3,.16],[.2,.34],[.14,.6],[.24,.78],[.3,.9],[.2,.98],[.05,1.02]],6:[[0,0],[.42,0],[.44,.07],[.32,.16],[.22,.36],[.16,.64],[.27,.82],[.3,.95],[.18,1.02],[0,1.04]]};
+add(lathe(L[t]));
+if(t==1)add(new THREE.SphereGeometry(.16,24,16),0,.55,0);
+if(t==4)[[-.19,-.19],[.19,-.19],[-.19,.19],[.19,.19]].forEach(([x,z])=>add(new THREE.BoxGeometry(.13,.12,.13),x,.8,z));
+if(t==3)add(new THREE.SphereGeometry(.09,16,12),0,1.03,0);
+if(t==5){add(new THREE.TorusGeometry(.2,.04,10,24).rotateX(Math.PI/2),0,1.03,0);add(new THREE.SphereGeometry(.07,12,10),0,1.1,0)}
+if(t==6){add(new THREE.BoxGeometry(.1,.34,.1),0,1.2,0);add(new THREE.BoxGeometry(.28,.09,.1),0,1.22,0)}
+if(t==2){add(new THREE.CylinderGeometry(.14,.2,.5,16),0,.55,.04).rotation.x=-.25;add(new THREE.BoxGeometry(.22,.26,.46),0,.88,-.1).rotation.x=.15;add(new THREE.BoxGeometry(.17,.15,.26),0,.82,-.36).rotation.x=.3;add(new THREE.ConeGeometry(.05,.14,8),-.07,1.06,0);add(new THREE.ConeGeometry(.05,.14,8),.07,1.06,0)}
+g.scale.setScalar(.96);g.userData={t,sd};if(sd<0)g.rotation.y=Math.PI;return g}
+function mkBoard(){const g=new THREE.Group(),lm_=new THREE.MeshStandardMaterial({color:0xe6cfa5,roughness:.55}),dm=new THREE.MeshStandardMaterial({color:0x6e4128,roughness:.5});
+for(let q=0;q<64;q++){const[x,z]=SQ(q),o=new THREE.Mesh(new THREE.BoxGeometry(1,.14,1),((q>>3)+(q&7))%2?dm:lm_);o.position.set(x,-.07,z);o.receiveShadow=true;g.add(o)}
+const fm=new THREE.MeshStandardMaterial({color:0x2a1810,roughness:.4,metalness:.1});[[0,-4.25,9,.5],[0,4.25,9,.5],[-4.25,0,.5,8],[4.25,0,.5,8]].forEach(([x,z,w,d])=>{const o=new THREE.Mesh(new THREE.BoxGeometry(w,.3,d),fm);o.position.set(x,-.1,z);o.receiveShadow=true;g.add(o)});return g}
+function cSync(ctx,st){Object.values(ctx.PM).forEach(o=>ctx.g.remove(o));ctx.PM={};for(let q=0;q<64;q++){const p=st.b[q];if(!p)continue;const m=mkPiece(Math.abs(p),Math.sign(p)),[x,z]=SQ(q);m.position.set(x,0,z);ctx.g.add(m);ctx.PM[q]=m}}
+function burst(g,x,y,z,c){for(let i=0;i<14;i++){const o=new THREE.Mesh(new THREE.SphereGeometry(.035,6,6),new THREE.MeshBasicMaterial({color:c,transparent:true})),a=Math.random()*6.28,s=.02+Math.random()*.04;o.position.set(x,y,z);o.userData={vx:Math.cos(a)*s,vz:Math.sin(a)*s,vy:.03+Math.random()*.05,t0:performance.now()};g.add(o);PART.push({o,g})}}
+function mvAnim(ctx,m,cb){const pm=ctx.PM[m.f];if(!pm){cb&&cb();return}const[x0,z0]=SQ(m.f),[x1,z1]=SQ(m.t),t0=performance.now(),dur=RM?60:640,hop=pm.userData.t==2?1:.45,sd=pm.userData.sd;
+let cap=null,cs=m.t;if(m.c){cs=m.ep?m.t+(sd==1?8:-8):m.t;cap=ctx.PM[cs]}
+let rook=null,rf=0,rt=0;if(m.cs){rf=m.cs==1?m.t+1:m.t-2;rt=m.cs==1?m.t-1:m.t+1;rook=ctx.PM[rf]}
+ANIM.push(now=>{const k=Math.min(1,(now-t0)/dur),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;pm.position.set(x0+(x1-x0)*e,Math.sin(Math.PI*k)*hop,z0+(z1-z0)*e);pm.rotation.z=Math.sin(Math.PI*k)*.12*(x1>x0?-1:1);
+if(rook){const[a,b]=SQ(rf),[c,d]=SQ(rt);rook.position.set(a+(c-a)*e,Math.sin(Math.PI*k)*.3,b+(d-b)*e)}
+if(cap){const c=Math.max(0,(k-.55)/.3);cap.scale.setScalar(Math.max(.001,.96*(1-c)));cap.position.y=c*.6;cap.rotation.y+=c*.3}
+if(k<1)return false;pm.position.set(x1,0,z1);pm.rotation.z=0;
+if(cap){ctx.g.remove(cap);delete ctx.PM[cs];burst(ctx.g,x1,.3,z1,sd>0?0x222233:0xffffff)}
+delete ctx.PM[m.f];ctx.PM[m.t]=pm;if(rook){const[a,b]=SQ(rt);rook.position.set(a,0,b);delete ctx.PM[rf];ctx.PM[rt]=rook}
+if(m.p){ctx.g.remove(pm);const q=mkPiece(Math.abs(m.p),Math.sign(m.p));q.position.set(x1,0,z1);ctx.g.add(q);ctx.PM[m.t]=q;burst(ctx.g,x1,.8,z1,0xffd54a)}
+cb&&cb();return true})}
+function ghost(m){const pm=CX.PM[m.f];if(!pm)return;const gh=pm.clone(true);gh.traverse(o=>{if(o.material){o.material=o.material.clone();o.material.transparent=true;o.material.opacity=.45}});CX.g.add(gh);const t0=performance.now(),[x0,z0]=SQ(m.f),[x1,z1]=SQ(m.t);
+ANIM.push(now=>{const n=Math.floor((now-t0)/1500);if(n>=2){CX.g.remove(gh);return true}const k=((now-t0)%1500)/1500,e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;gh.position.set(x0+(x1-x0)*e,Math.sin(Math.PI*k)*.5,z0+(z1-z0)*e);return false})}
+function initH(){if(R2)return true;try{R2=new THREE.WebGLRenderer({canvas:c3,antialias:true,alpha:true})}catch(e){R2=null;return false}
+R2.setPixelRatio(Math.min(devicePixelRatio,2));R2.outputEncoding=THREE.sRGBEncoding;R2.shadowMap.enabled=true;R2.shadowMap.type=THREE.PCFSoftShadowMap;CAM2=new THREE.PerspectiveCamera(38,1,.1,200);RC2=new THREE.Raycaster();
+MWm=new THREE.MeshPhysicalMaterial({color:0xf0e6cf,roughness:.32,clearcoat:.7,clearcoatRoughness:.15});MBm=new THREE.MeshPhysicalMaterial({color:0x17181f,roughness:.28,metalness:.15,clearcoat:.9,clearcoatRoughness:.12});
+SHm=new THREE.Scene();SCh=new THREE.Scene();SAn=new THREE.Scene();
+[SHm,SCh,SAn].forEach(sc=>{sc.add(new THREE.HemisphereLight(0xdfe8ff,0x20243a,.75));const d=new THREE.DirectionalLight(0xffffff,.85);d.position.set(5,10,6);d.castShadow=true;d.shadow.mapSize.set(1024,1024);const q=d.shadow.camera;q.left=q.bottom=-7;q.right=q.top=7;q.near=1;q.far=30;sc.add(d);const p=new THREE.PointLight(0xff2d9a,.4);p.position.set(-6,4,-4);sc.add(p)});
+/* home: dartboard model */
+const tx=new THREE.CanvasTexture(BC||(BC=tex()));tx.encoding=THREE.sRGBEncoding;tx.anisotropy=4;hd=new THREE.Group();
+hd.add(new THREE.Mesh(new THREE.CircleGeometry(230,64),new THREE.MeshStandardMaterial({map:tx,roughness:.9})));const bd=new THREE.Mesh(new THREE.CylinderGeometry(236,236,44,64).rotateX(Math.PI/2),new THREE.MeshStandardMaterial({color:0x08080a}));bd.position.z=-23;hd.add(bd);
+const rim=new THREE.Mesh(new THREE.TorusGeometry(234,8,12,96),new THREE.MeshStandardMaterial({color:0x0a0a0c,roughness:.5,metalness:.3}));hd.add(rim);SHm.add(hd);
+/* home: chess model */
+hc=mkBoard();HCX={g:hc,PM:{},st:cinit()};cSync(HCX,HCX.st);SHm.add(hc);
+/* chess game scene */
+CX={g:mkBoard(),PM:{}};SCh.add(CX.g);const fl=new THREE.Mesh(new THREE.CircleGeometry(16,48).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:0x0b1030,roughness:.9}));fl.position.y=-.3;fl.receiveShadow=true;SCh.add(fl);
+const gr=new THREE.GridHelper(40,40,0x2d8cff,0x1a2150);gr.position.y=-.01;SAn.add(gr);
+new ResizeObserver(fit2).observe($('#hx'));fit2();loop2();return true}
+function fit2(){if(!R2)return;const w=$('#hx').clientWidth,h=$('#hx').clientHeight;if(!w||!h)return;R2.setSize(w,h,false);CAM2.aspect=w/h;CAM2.updateProjectionMatrix()}
+function updCam(){const as=CAM2.aspect;if(scn===SHm){CAM2.position.set(0,0,as<1?10.4:7.6);CAM2.lookAt(0,0,0);return}
+const wd=scn===SCh?10:CHW+3,ds=Math.max(scn===SCh?DS:9,wd/(2*Math.tan(19*Math.PI/180)*Math.min(as,1.6)));CAM2.position.set(Math.sin(AZ)*Math.cos(EL)*ds,Math.sin(EL)*ds,Math.cos(AZ)*Math.cos(EL)*ds);CAM2.lookAt(0,scn===SCh?0:1,0)}
+const HSEQ=['e2e4','e7e5','g1f3','b8c6','f1c4','g8f6','f3g5','d7d5','e4d5','f6d5','g5f7','e8f7','d1f3'];
+function homeUpd(now){const t=now/1000,por=CAM2.aspect<1,pk=HPT?Math.min(1,(now-HPT)/380):0,pop=w=>1+(HPW==w?.28*Math.sin(Math.PI*pk):0);
+hd.position.set(por?0:-1.9,(por?1.6:0)+Math.sin(t*1.1)*.07,0);hd.rotation.set(Math.sin(t*.4)*.12,Math.sin(t*.6)*.3,0);hd.scale.setScalar(1.45/230*pop('d'));
+hc.position.set(por?0:1.9,(por?-1.7:0)+Math.cos(t*1.0)*.07,0);hc.rotation.set(.55,t*.35,0);hc.scale.setScalar(.34*pop('c'));
+if(now>hNext){hNext=now+2600;const x=(Math.random()-.5)*200,y=(Math.random()-.5)*200,d=mkDart(0xff2d9a);d.userData={x,y,t0:now,fly:1};hd.add(d);hdD.push(d);if(hdD.length>4)hd.remove(hdD.shift())}
+hdD.forEach(d=>{const u=d.userData;if(!u.fly)return;const k=Math.min(1,(now-u.t0)/700),e=k*k;d.position.set(u.x*(.6+.4*e),u.y*(.6+.4*e)-260*(1-e),700*(1-e));d.rotation.set(.05,.03,(1-e)*8);if(k>=1){u.fly=0;d.position.set(u.x,u.y,-3);d.rotation.set(.1,.05,0)}});
+if(now>hcT){hcT=now+2400;const mv=HSEQ[hSi],f=(8-+mv[1])*8+mv.charCodeAt(0)-97,to=(8-+mv[3])*8+mv.charCodeAt(2)-97,m=mv&&clegal(HCX.st).find(q=>q.f==f&&q.t==to);
+if(m){cmake(HCX.st,m);mvAnim(HCX,m,null);hSi++}else{HCX.st=cinit();cSync(HCX,HCX.st);hSi=0}}}
+function loop2(){requestAnimationFrame(loop2);if($('#hx').hidden||document.hidden||!R2)return;const now=performance.now();ANIM=ANIM.filter(f=>!f(now));
+PART=PART.filter(p=>{const u=p.o.userData,a=now-u.t0;if(a>700){p.g.remove(p.o);return false}p.o.position.x+=u.vx;p.o.position.z+=u.vz;u.vy-=.0025;p.o.position.y+=u.vy;p.o.material.opacity=1-a/700;return true});
+if(scn===SHm)homeUpd(now);
+else if(scn===SCh){if(HLG&&HLG.userData.p)HLG.userData.p.forEach(m=>m.material.opacity=.45+.35*Math.sin(now*.008))}
+else if(scn===SAn){if(!dgm)AZ+=.0018;BARS.forEach((m,i)=>{const k=Math.max(0,Math.min(1,(now-BT-i*28)/700)),c1=1.70158,e=1+(c1+1)*Math.pow(k-1,3)+c1*Math.pow(k-1,2),h=m.userData.h*e;m.scale.y=Math.max(.001,Math.abs(h));m.position.y=h/2})}
+updCam();R2.render(scn,CAM2)}
+function mkChart(vals,cols,sc){if(CHG)SAn.remove(CHG);CHG=new THREE.Group();BARS=[];const n=vals.length,w=.34,gp=.12;
+vals.forEach((v,i)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,1,w),new THREE.MeshStandardMaterial({color:cols[i],roughness:.35,metalness:.2,emissive:cols[i],emissiveIntensity:.2}));m.position.x=(i-(n-1)/2)*(w+gp);m.scale.y=.001;m.userData={h:v/sc};CHG.add(m);BARS.push(m)});
+const ln=new THREE.Mesh(new THREE.BoxGeometry(n*(w+gp)+.4,.03,.06),new THREE.MeshBasicMaterial({color:0x8899ff}));CHG.add(ln);SAn.add(CHG);BT=performance.now();CHW=n*(w+gp)}
+/* ---- chess game ---- */
+function cInit(){cst=cinit();hist2=[cl(cst)];evl=[];mvl=[];sel=-1;lm=null;hintMv=null;gameOver=0;busy=0;if(CX){cSync(CX,cst);cRefresh()}}
+function cRefresh(){LM=clegal(cst);cHL();cUI()}
+function cUI(){if(!cst||!$('#cs'))return;let t='';if(gameOver)t=gameOver;else if(busy&&cst.side==-1)t='Bot is thinking…';else if(cst.side==1){const s=cstat(cst);t=(s.chk?'Check! ':'')+'Your move (White)'}$('#cs').textContent=t+(mvl.length?' · last: '+mvl[mvl.length-1].m:'')}
+function cHL(){if(!SCh)return;if(HLG)SCh.remove(HLG);HLG=new THREE.Group();const add=(q,c,o,geo)=>{const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false})),[x,z]=SQ(q);m.position.set(x,.03,z);HLG.add(m);return m},sg=()=>new THREE.PlaneGeometry(.96,.96).rotateX(-Math.PI/2);
+if(lm){add(lm.f,0xffd54a,.32,sg());add(lm.t,0xffd54a,.4,sg())}
+if(cst){const k=cst.b.indexOf(cst.side*6);if(k>=0&&catt(cst.b,k,-cst.side))add(k,0xff3355,.55,sg())}
+if(sel>=0){add(sel,0x2d8cff,.55,sg());LM.filter(m=>m.f==sel&&(!m.p||Math.abs(m.p)==5)).forEach(m=>{if(m.c)add(m.t,0xff3355,.8,new THREE.RingGeometry(.36,.46,32).rotateX(-Math.PI/2));else add(m.t,0x34e08a,.85,new THREE.CircleGeometry(.16,24).rotateX(-Math.PI/2))})}
+if(hintMv){HLG.userData.p=[add(hintMv.f,0xffd54a,.7,sg()),add(hintMv.t,0x34e08a,.7,sg())]}SCh.add(HLG)}
+function cTap(q){if(busy||gameOver||cst.side!=1)return;if(sel>=0){const m=LM.find(m=>m.f==sel&&m.t==q&&(!m.p||Math.abs(m.p)==5));if(m)return cPlay(m)}sel=cst.b[q]>0?q:-1;cHL()}
+function cPlay(m){busy=1;sel=-1;hintMv=null;const mover=cst.side,t=Math.abs(cst.b[m.f]),L='PNBRQK'[t-1],nm=m.cs?(m.cs==1?'O-O':'O-O-O'):(L=='P'?'':L)+fsq(m.f)+(m.c?'x':'-')+fsq(m.t)+(m.p?'='+'PNBRQK'[Math.abs(m.p)-1]:'');
+cmake(cst,m);hist2.push(cl(cst));mvl.push({m:nm,side:mover});lm=m;cHL();
+mvAnim(CX,m,()=>{const v=cst.side*cneg(cst,2,-1e9,1e9,0);evl.push({e:Math.max(-1500,Math.min(1500,v))});const s=cstat(cst);mvl[mvl.length-1].m+=s.end&&s.why=='mate'?'#':s.chk?'+':'';busy=0;LM=clegal(cst);cHL();if(s.end)cEnd(s);else{cUI();if(cst.side==-1)botTurn()}})}
+function botTurn(){busy=1;cUI();setTimeout(()=>{const r=cbest(cst,[1,2,3][botLv],[140,25,0][botLv]);if(!r){busy=0;return}cPlay(r.m)},420)}
+function cUndo(){if(busy||hist2.length<2)return;const n=cst.side==1?Math.min(2,hist2.length-1):1;for(let i=0;i<n;i++){hist2.pop();mvl.pop();evl.pop()}cst=cl(hist2[hist2.length-1]);gameOver=0;sel=-1;lm=null;hintMv=null;cSync(CX,cst);cRefresh()}
+function cHint(){if(busy||gameOver||cst.side!=1)return;busy=1;$('#cs').textContent='Calculating the best move…';setTimeout(()=>{const r=cbest(cst,3,0);busy=0;if(!r)return;hintMv=r.m;cHL();ghost(r.m);$('#cs').textContent='Hint: '+fsq(r.m.f)+' → '+fsq(r.m.t)+' (engine eval '+(r.v/100).toFixed(1)+')'},40)}
+function cStats(){let prev=0;const h={g:0,i:0,m:0,b:0,sum:0,n:0},cls=[];evl.forEach((x,i)=>{const mv=mvl[i].side,loss=Math.max(0,mv==1?prev-x.e:x.e-prev);prev=x.e;const c=loss>=300?'b':loss>=150?'m':loss>=60?'i':'g';cls.push({c,loss,mover:mv});if(mv==1){h.n++;h.sum+=loss;h[c]++}});const avg=h.n?h.sum/h.n:0;return{cls,h,avg,acc:h.n?Math.max(0,Math.min(100,100-avg/6)):0}}
+function cEnd(s){busy=0;let res='draw',msg='';if(s.why=='mate'){const w=cst.side==-1;res=w?'win':'loss';msg=w?'Checkmate - you win!':'Checkmate - the bot wins'}else msg='Draw ('+({stale:'stalemate','50':'50-move rule',insuf:'insufficient material'})[s.why]+')';gameOver=msg;const st=cStats();
+PRF.games.push({t:Date.now(),res,acc:+st.acc.toFixed(1),mv:Math.ceil(mvl.length/2),lv:botLv,bl:st.h.b,ms:st.h.m,ia:st.h.i});prfSave();cUI();setTimeout(()=>{if(scn===SCh)cAnalysis()},1500)}
+function cAnalysis(){if(!mvl.length){cUI();return}const st=cStats(),cl_={g:0x34e08a,i:0xffd54a,m:0xff9a2d,b:0xff3355},cols=st.cls.map(x=>x.mover==1?cl_[x.c]:0x4a6bd6),vals=evl.map(x=>Math.max(-600,Math.min(600,x.e))/200);AZ=.5;EL=.55;scn=SAn;mkChart(vals,cols,1);
+hu.innerHTML=`<div class="hb"><button onclick="goChess()">← Board</button><b>📊 Game analysis</b></div><div class="ht">Bars = evaluation after each move (up = White ahead). Colour = quality of your moves. Drag to rotate.</div><div class="hc"><div id="tiles">${tls([['Accuracy %',st.acc,0,'heuristic'],['Avg loss (cp)',st.avg,0,'per your move'],['Moves',Math.ceil(mvl.length/2),0,'full moves'],['Good',st.h.g,0,'&lt;60 cp loss'],['Inaccuracies',st.h.i,0,'60-149 cp'],['Mistakes / blunders',st.h.m+st.h.b,0,'150+ cp']])}</div><small>Accuracy and move quality come from a depth-2 engine evaluation after each move: a heuristic, not an official rating. Saved to your profile when a game ends.</small><div class="kr"><button class="pri" onclick="cInit();goChess()">New game</button><button onclick="goProfile()">👤 Profile</button></div></div>`;cnt()}
+function goProfile(){if(!initH())return;const G_=PRF.games,n=G_.length,w=G_.filter(g=>g.res=='win').length,l=G_.filter(g=>g.res=='loss').length,avg=n?G_.reduce((a,g)=>a+g.acc,0)/n:0,best=n?Math.max(...G_.map(g=>g.acc)):0,bl=G_.reduce((a,g)=>a+g.bl,0);
+scn=SAn;AZ=.4;EL=.5;const last=G_.slice(-30);mkChart(last.map(g=>g.acc/25),last.map(g=>g.res=='win'?0x34e08a:g.res=='loss'?0xff3355:0xffd54a),1);
+hu.innerHTML=`<div class="hb"><button onclick="goChess()">←</button><b>👤 Profile</b></div><div class="ht">Bars = accuracy per game (last 30). Green win, red loss, yellow draw.</div><div class="hc"><div class="kr"><input id="pn" value="${esc(PRF.name)}" maxlength="14" aria-label="Profile name" oninput="PRF.name=this.value;prfSave()">${COL.slice(0,5).map(c=>`<button style="background:${c};min-width:36px;flex:0" onclick="PRF.color='${c}';prfSave()" aria-label="Colour"></button>`).join('')}</div><div id="tiles">${tls([['Games',n,0,'completed'],['Wins',w,0,n?(w/n*100).toFixed(0)+'% win rate':'-'],['Losses',l,0,''],['Avg accuracy',avg,1,'heuristic'],['Best accuracy',best,1,''],['Blunders',bl,0,'all games']])}</div><small>Stored on this device only. Chess games are saved when they end.</small></div>`;cnt()}
+function chessHUD(){hu.innerHTML=`<div><div class="hb"><button onclick="goHome()" aria-label="Home">🏠</button><b>♟ Chess</b><select id="lv" aria-label="Bot level" onchange="botLv=+this.value"><option value="0">Easy</option><option value="1">Medium</option><option value="2">Hard</option></select></div><div class="ht" id="cs"></div></div><div class="hb"><button onclick="cUndo()">↶ Undo</button><button onclick="cHint()">💡 Hint</button><button onclick="cInit()">⟲ New</button><button onclick="cAnalysis()">📊</button><button onclick="goProfile()">👤</button></div>`;$('#lv').value=botLv;cUI()}
+function homeHUD(){hu.innerHTML=`<div class="hb"><b>DartScope Arena</b></div><div class="ht">Tap a model to play, or use the buttons.</div><div class="hb"><button class="big pri" onclick="pickG('d')">🎯 Darts</button><button class="big pri" onclick="pickG('c')">♟ Chess</button></div>`}
+function goHome(){try{camStop()}catch(e){}$('#s').hidden=$('#g').hidden=true;$('#hx').hidden=false;homeHUD();if(initH()){scn=SHm;fit2()}}
+function goDarts(){HPT=0;$('#hx').hidden=true;menu()}
+function goChess(){HPT=0;$('#s').hidden=$('#g').hidden=true;$('#hx').hidden=false;if(!initH())return homeHUD();scn=SCh;if(!cst){cInit()}else{cSync(CX,cst);cRefresh()}fit2();chessHUD()}
+function pickG(w){HPW=w;HPT=performance.now();setTimeout(()=>w=='d'?goDarts():goChess(),400)}
+c3.addEventListener('pointerdown',e=>{dg0={x:e.clientX,y:e.clientY};dgm=0});
+c3.addEventListener('pointermove',e=>{if(!dg0||!e.buttons)return;const dx=e.clientX-dg0.x,dy=e.clientY-dg0.y;if(!dgm&&Math.hypot(dx,dy)<6)return;dgm=1;if(scn!==SHm){AZ-=dx*.008;EL=Math.max(.25,Math.min(1.45,EL+dy*.006))}dg0={x:e.clientX,y:e.clientY}});
+c3.addEventListener('pointerup',e=>{dg0=null;if(dgm){dgm=0;return}if(!R2)return;const r=c3.getBoundingClientRect();RC2.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1),CAM2);
+if(scn===SHm){const h=RC2.intersectObjects([hd,hc],true)[0];if(!h)return;let o=h.object;while(o&&o!==hd&&o!==hc)o=o.parent;if(o===hd)pickG('d');else if(o===hc)pickG('c');return}
+if(scn!==SCh)return;const hs=RC2.intersectObjects(Object.values(CX.PM),true)[0];if(hs){let o=hs.object;while(o.parent&&o.parent!==CX.g)o=o.parent;return cTap(Math.round(o.position.z+3.5)*8+Math.round(o.position.x+3.5))}
+const pt=new THREE.Vector3();if(RC2.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),pt)){const f=Math.floor(pt.x+4),q=Math.floor(pt.z+4);if(f>=0&&f<8&&q>=0&&q<8)cTap(q*8+f)}});
+c3.addEventListener('wheel',e=>{DS=Math.max(7,Math.min(30,DS+e.deltaY*.01))});
 /* ===== 3D scene ===== */
 let R,SC,CAM,face,wall,tilt=false,D=800;const RC=new THREE.Raycaster(),D3=[],anim=[],fx=[],wob=[],cv=$('#cv'),RM=matchMedia('(prefers-reduced-motion:reduce)').matches;let shake=0;
 function tex(){const S=2048,c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d'),h=S/2,k=h/B.face,A=i=>(i*18-99)*Math.PI/180;
@@ -415,5 +598,5 @@ const h=RC.intersectObjects([face,wall])[0];if(!h)return;const{x,y}=h.point,o=h.
 /* ===== Boot ===== */
 init3();try{const s=localStorage.getItem(K);if(s){G=JSON.parse(s);if(G&&G.players)names=G.players.map(p=>p.n);else G=null}if(G)try{H=JSON.parse(localStorage.getItem('dartscope-h')||'[]')}catch(e){H=[]}}catch(e){G=null}
 try{const c=JSON.parse(localStorage.getItem('dartscope-cfg')||'null');if(c&&c.C&&Array.isArray(c.names)&&c.names.length){C=c.C;if(!G)names=c.names}}catch(e){}
-sm(1);sv();$('#s').hidden=false;
+sm(1);sv();$('#s').hidden=true;goHome();
 </script></body></html>
