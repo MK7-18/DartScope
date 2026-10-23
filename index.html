@@ -1,0 +1,419 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DartScope</title>
+<style>
+:root{--bg:#070a18;--p:#0f1430;--t:#fff;--m:#9aa3c7;--mag:#ff2d9a;--blu:#2d8cff;--grn:#34e08a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark;background:var(--bg)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:inherit;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--t);font:15px/1.3 system-ui,-apple-system,"Segoe UI",sans-serif}
+[hidden]{display:none!important}
+button,input,select{font:inherit;color:var(--t);background:#1a2150;border:1px solid #2d3a80;border-radius:12px;padding:8px 12px;min-height:44px;min-width:0}
+button{cursor:pointer}button.pri{background:linear-gradient(135deg,var(--mag),#7a2dff);border:0;font-weight:700}button:disabled{opacity:.3}
+button.on{outline:2px solid var(--blu)}
+#s{max-width:520px;margin:auto;padding:16px;display:grid;gap:10px}h1{margin:0;font-size:28px}h1 i{color:var(--mag);font-style:normal}
+.pn{display:flex;gap:6px}.pn input{flex:1;background:var(--p)}.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}small,.m{color:var(--m)}
+#g{display:flex;flex-direction:column;height:100%;max-width:560px;margin:auto;padding:6px;gap:6px}
+#top{display:flex;justify-content:space-between;align-items:center}#top button{min-height:36px}
+#cards{display:flex;gap:6px;overflow-x:auto}.card{flex:1 0 108px;background:var(--p);border-radius:12px;padding:8px 10px;border-bottom:3px solid transparent}
+.card.on{background:linear-gradient(135deg,var(--c),#0b0f26 130%);border-color:var(--c)}.sc{font-size:44px;font-weight:800;line-height:1}
+#row{display:flex;gap:6px;align-items:center}#sl{display:flex;gap:6px;flex:1}.sl{flex:1;border:1px dashed #3a4690;border-radius:10px;text-align:center;padding:6px 2px;min-height:40px}
+#vt{font-size:26px;min-width:64px;text-align:right}#chk{min-height:20px;color:var(--grn);font-weight:600}
+#bw{flex:1;min-height:0;position:relative}#cv{width:100%;height:100%;display:block;touch-action:manipulation;user-select:none}
+#toast{position:absolute;left:0;right:0;top:6px;text-align:center;font-size:26px;font-weight:800;opacity:0;transition:opacity .2s;pointer-events:none;text-shadow:0 2px 8px #000}#toast.on{opacity:1}
+#kp{background:var(--p);border-radius:12px;padding:8px;display:grid;gap:6px}#nums{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}#nums button{padding:4px 0;min-height:38px}
+.kr{display:flex;gap:6px}.kr button{flex:1}#bar{display:flex;gap:6px}#bar button{flex:1}
+#ov{position:fixed;inset:0;background:#000c;display:grid;place-items:center;padding:16px}.bx{background:var(--p);border-radius:16px;padding:18px;display:grid;gap:8px;max-width:420px;width:100%}
+table{width:100%;border-collapse:collapse}td,th{padding:4px;text-align:left}
+body{background:radial-gradient(800px 420px at 50% -8%,#3a1466 0,transparent 62%),radial-gradient(600px 420px at 100% 100%,#0c2c6b 0,transparent 58%),var(--bg) fixed}
+button{transition:transform .12s,filter .15s;background:linear-gradient(180deg,#232c6b,#171d4a)}button:active{transform:scale(.94)}button.pri{box-shadow:0 6px 20px -6px var(--mag)}
+.card,#kp,.bx{border:1px solid #ffffff18;backdrop-filter:blur(10px)}.card{transition:transform .3s,box-shadow .3s}.card.on{box-shadow:0 0 26px -6px var(--c);transform:translateY(-2px)}
+.sc{font-variant-numeric:tabular-nums;letter-spacing:-1px}.sc.pop{animation:pop .4s}.sl{transition:all .25s}.sl.f{border:1px solid var(--blu);background:#14226a;animation:pop .35s}.sl.x{border-color:#ff4d6d;background:#3a1230}
+#toast.on{animation:pop .35s}#c2{width:100%;height:100%;display:block;touch-action:manipulation}.kr input,.kr select{flex:1}
+@keyframes pop{0%{transform:scale(.82)}45%{transform:scale(1.12)}100%{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+#g{padding:4px;gap:4px;max-width:760px}.card{padding:5px 8px;flex-basis:96px}.sc{font-size:34px}.sl{min-height:32px;padding:2px}.sl br{display:none}.sl small{margin-left:5px}#vt{font-size:22px;min-width:56px}#top button{min-height:32px}
+#chk{position:absolute;left:0;right:0;bottom:0;min-height:0;text-align:center;pointer-events:none;text-shadow:0 1px 6px #000;z-index:2}
+#g.an #cards,#g.an #row,#g.an #bar,#g.an #kp,#g.an #top{display:none}
+#ap{overflow:auto;max-height:46vh;display:grid;gap:8px;align-content:start}.ch{flex-wrap:wrap}.ch button{flex:0 1 auto;min-height:34px;padding:4px 10px}
+#tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.tl{background:var(--p);border:1px solid #ffffff18;border-radius:12px;padding:6px 8px}.tl b{display:block;font-size:24px;font-variant-numeric:tabular-nums}.tl small{display:block;font-size:11px}
+.br{display:grid;grid-template-columns:52px 1fr 24px;gap:6px;align-items:center}.bar{height:10px;background:#ffffff14;border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blu),var(--mag));border-radius:6px;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+#sp{width:100%;height:60px}.sp{stroke-dasharray:1;stroke-dashoffset:1;animation:dr 1.3s .2s forwards}@keyframes dr{to{stroke-dashoffset:0}}.tp{background:var(--p);border-left:3px solid var(--grn);border-radius:8px;padding:6px 8px}
+@media(prefers-reduced-motion:reduce){.sp{stroke-dashoffset:0}}
+.bx{position:relative}.xb{position:absolute;top:8px;right:8px;min-height:36px;width:36px;padding:0}
+#cv,#c2{touch-action:none}
+#ad{position:fixed;left:0;right:0;bottom:0;max-height:58vh;overflow:auto;background:#0b1030f2;border-top:1px solid #ffffff22;z-index:20;padding:6px;display:grid;gap:6px;backdrop-filter:blur(8px)}
+#av{position:relative;display:block;width:fit-content;max-width:100%;margin:auto;background:#000}#vd{display:block;max-height:30vh;max-width:100%;width:auto}#vo{position:absolute;inset:0;width:100%;height:100%;touch-action:none}#ast{font-size:13px}
+#acf{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:center;background:#161c4a;border-radius:10px;padding:6px}#cc{border-radius:8px;background:#000}
+.fl{display:flex;align-items:center;justify-content:center;min-height:44px;padding:8px 12px;border:1px solid #2d3a80;border-radius:12px;background:linear-gradient(180deg,#232c6b,#171d4a);cursor:pointer;flex:1}
+#ad.mini{left:4px;right:auto;bottom:56px;width:160px;border-radius:12px;max-height:none;padding:4px;gap:2px}#ad.mini #vd{max-height:56px}#ad.mini .kr{display:none}#ad.mini #ast{font-size:10px}
+#bt{position:absolute;right:2px;top:2px;display:flex;flex-direction:column;gap:4px;z-index:3}#bt button{width:32px;height:32px;min-height:0;padding:0;border-radius:10px;font-size:13px;opacity:.9;background:#0d1236cc}
+#g.fs{padding:2px;gap:2px}#g.fs #top{display:none}#g.fs .card{padding:2px 6px;flex-basis:68px;border-radius:8px}#g.fs .card b{font-size:10px}#g.fs .sc{font-size:17px}#g.fs .card small{display:none}#g.fs .sl{min-height:20px;font-size:10px;padding:0}#g.fs #vt{font-size:14px;min-width:34px}#g.fs #bar button{min-height:28px;font-size:11px;padding:2px 4px}#g.fs #chk{font-size:11px}
+#chk{bottom:2px;left:50%;right:auto;transform:translateX(-50%);width:max-content;max-width:94%;padding:3px 10px;background:#0b1030d9;border:1px solid #ffffff22;border-radius:12px;pointer-events:auto;cursor:pointer;font-size:13px;line-height:1.25}#chk small{color:var(--m);font-weight:400}
+#ad{z-index:50;gap:8px;padding:10px 10px calc(10px + env(safe-area-inset-bottom,0px));border-radius:18px 18px 0 0;background:#0a0f2ef5;box-shadow:0 -12px 40px #000a}
+#ah{display:flex;align-items:center;justify-content:space-between;gap:8px}#ah b{font-size:16px}.bt3{display:flex;gap:4px}#ah button{min-height:34px;width:34px;padding:0}
+#stp{display:flex;gap:4px;flex:1;justify-content:center;flex-wrap:wrap}#stp i{font-style:normal;font-size:11px;padding:3px 8px;border-radius:99px;background:#ffffff14;color:var(--m)}#stp i.on{background:var(--mag);color:#fff}#stp i.dn{background:#34e08a33;color:var(--grn)}
+.lk{background:#2a1a4a;border:1px solid #ff2d9a55;border-radius:12px;padding:8px;display:grid;gap:6px}.lk input{flex:2;min-width:0}#ad details{font-size:12px;color:var(--m)}
+#ad.full{top:0;left:0;right:0;bottom:0;max-height:none;border-radius:0;padding-top:calc(10px + env(safe-area-inset-top,0px));align-content:start;overflow:auto;width:auto}#ad.full #vd{max-height:52vh}
+#ad.mini #ah b,#ad.mini #stp,#ad.mini details,#ad.mini .lk{display:none}#ad.mini #ah{justify-content:flex-end}
+</style></head><body>
+<div id="s" hidden></div>
+<div id="g" hidden>
+<div id="top"><b id="info"></b><span><button onclick="AB=1;openAn()" aria-label="Analytics">📊</button> <button id="mn" aria-label="Back to menu">☰ Menu</button></span></div>
+<div id="cards"></div>
+<div id="row"><div id="sl"></div><b id="vt">0</b></div>
+
+<div id="bw"><canvas id="cv" role="img" aria-label="3D dartboard. Tap where your dart landed, or use the keypad."></canvas><canvas id="c2" hidden role="img" aria-label="2D dartboard. Tap where your dart landed."></canvas><div id="bt"><button id="zb" aria-label="Zoom into a segment">🔍</button><button id="fb" aria-label="Focus mode: bigger board" aria-pressed="false">⛶</button><button id="cb" aria-label="AutoDart camera">📷</button><button id="hb" aria-label="Finish assistant highlight on or off">🏁</button></div><div id="chk"></div><div id="toast"></div></div>
+<div id="kp" hidden><div class="kr"><button class="mu" data-m="1" onclick="sm(1)">Single</button><button class="mu" data-m="2" onclick="sm(2)">Double</button><button class="mu" data-m="3" onclick="sm(3)">Treble</button></div>
+<div id="nums"></div><div class="kr"><button id="k25" onclick="kp(25)">25</button><button onclick="bull()">BULL 50</button><button onclick="miss()">MISS</button></div><div class="kr"><input id="mt" type="number" inputmode="numeric" min="0" max="180" placeholder="Visit total" aria-label="Visit total"><select id="mn2" aria-label="Darts used"><option>3</option><option>2</option><option>1</option></select><select id="mf" aria-label="Finishing dart"></select><button onclick="man()">Add visit</button></div><small id="mm" role="status"></small><small id="pv"></small></div>
+<div id="ap" hidden></div><div id="bar"><button id="tl" aria-pressed="false">Tilt</button><button id="kb" aria-label="Keypad">123</button><button id="un" aria-label="Undo last dart">↶</button><button id="md" aria-label="Switch between 2D and 3D board">2D</button><button id="nx" class="pri">Next</button></div>
+<div id="ad" hidden role="dialog" aria-label="AutoDart camera"><div id="ah"><b>📷 AutoDart</b><span id="stp"><i>1 Camera</i><i>2 Calibrate</i><i>3 Play</i></span><span class="bt3"><button onclick="adMini()" aria-label="Minimise">▁</button><button onclick="adFull()" aria-label="Expand to full screen">⤢</button><button onclick="camStop()" aria-label="Close camera">✕</button></span></div>
+<div id="av"><video id="vd" playsinline muted></video><canvas id="vo" aria-label="Camera overlay. Tap to calibrate."></canvas></div><div id="ast" role="status">Camera off.</div>
+<div id="alk" class="lk" hidden><small>Camera is blocked inside this embedded view. Open this link in Safari:</small><div class="kr"><input id="alu" readonly aria-label="Page link"><button onclick="copyLink()">Copy / share</button><button onclick="openFull()">Open tab</button></div></div>
+<div class="kr ch"><button id="a1" class="pri" onclick="camStart()">Start camera</button><button onclick="camFlip()">Flip</button><button onclick="calStart()">Calibrate</button><button onclick="RB=1;AST='wait';stab=0">Re-baseline</button><button onclick="miss()">Confirm miss</button></div>
+<div class="kr ch"><label class="fl">🎞 Analyse a video<input id="vf" type="file" accept="video/*" hidden></label><button onclick="vp()" aria-label="Play or pause video">▶/⏸</button><select id="am" aria-label="AutoDart mode"><option value="c">Conservative</option><option value="b">Balanced</option><option value="a">Automatic</option></select></div>
+<details><summary>Camera help (iPhone)</summary><small>Use Safari, not an in-app browser. Settings > Safari > Camera: Ask. The page must be on HTTPS and opened on its own (not embedded). Mount the phone still with the whole board in view and steady light, then calibrate. Share > Add to Home Screen gives a full-screen app.</small></details>
+<div id="acf" hidden><canvas id="cc" width="160" height="120"></canvas><div><b id="apr"></b><div class="kr ch"><button class="pri" onclick="cfm(1)">Confirm</button><button onclick="cfm(2)">Correct</button><button onclick="cfm(3)">Miss</button><button onclick="cfm(0)">Reject</button></div></div></div></div><div id="ov" hidden></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ===== Board constants (mm) – shared by texture, hit test and darts ===== */
+const ORDER=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+const B={bi:6.35,bo:15.9,ti:99,to:107,di:162,dout:170,face:230,wall:-40};
+var SRC='m';const COL=['#ff2d9a','#2d8cff','#34e08a','#ffb12d','#b46bff','#ff6b4a','#2dd9e0','#e0e02d'];
+function hit(x,y){const r=Math.hypot(x,y);if(r>B.dout)return{seg:0,m:0};if(r<=B.bi)return{seg:25,m:2};if(r<=B.bo)return{seg:25,m:1};
+const a=(Math.atan2(x,y)*180/Math.PI+369)%360;return{seg:ORDER[Math.floor(a/18)],m:r>B.ti&&r<=B.to?3:r>B.di?2:1}}
+/* ===== Pure X01 engine ===== */
+function applyDart(g,seg,m,x,y,k){const p=g.players[g.cur],o=g.cfg,before=p.score,v=g.visit;let inc=seg*m,ent=!!p.entered;
+if(!ent){const ok=o.inR==0||(o.inR==1&&m==2)||(o.inR==2&&m>=2);ent=ok;if(!ok)inc=0}
+const ns=before-inc;let st='';
+if(ns<0)st='bust';else if(ns==0&&inc>0){st=(o.outR==0||(o.outR==1&&m==2)||(o.outR==2&&m>=2))?'win':'bust'}else if(ns==1&&o.outR>0)st='bust';
+const d={seg,m,x,y,k:k?1:0,miss:!seg,pts:st=='bust'?0:inc};p.darts++;v.push(d);
+if(st=='bust'){p.score=g.vs.score;p.entered=g.vs.entered;p.pts-=v.slice(0,-1).reduce((a,b)=>a+b.pts,0);g.pend='bust'}
+else{p.score=ns;p.entered=ent?1:0;p.pts+=inc;if(st=='win')g.pend='win';else if(v.length==3)g.pend='full'}
+g.events.push({m:g.id,p:g.cur,leg:g.leg,mode:'x01',t:Date.now(),from:before,pts:d.pts,seg,mult:m,x:+(x/B.dout).toFixed(4),y:+(y/B.dout).toFixed(4),k:k|0,src:SRC,miss:d.miss?1:0,co:ent&&before<=170?1:0,done:st=='win'?1:0,bust:st=='bust'?1:0,dn:v.length});
+return st}
+function finish(g){const p=g.players[g.cur],s=g.visit.reduce((a,d)=>a+d.pts,0);
+if(g.pend!='bust'&&s){p.hi=Math.max(p.hi,s);if(s==180)p.t180++}
+if(g.pend=='win'){p.legs++;if(p.legs>=g.cfg.legs){g.over=1;g.pend=null;g.visit=[];return}
+g.leg++;g.starter=(g.starter+1)%g.players.length;g.cur=g.starter;g.players.forEach(q=>{q.score=g.cfg.start;q.entered=g.cfg.inR?0:1})}
+else g.cur=(g.cur+1)%g.players.length;
+g.visit=[];g.pend=null;const q=g.players[g.cur];g.vs={score:q.score,entered:q.entered}}
+/* checkout finder */
+const DL=[];for(let n=1;n<=20;n++)for(let m=1;m<=3;m++)DL.push({n,m,p:n*m});DL.push({n:25,m:1,p:25},{n:25,m:2,p:50});DL.sort((a,b)=>b.p-a.p||b.m-a.m);
+const dn=d=>d.n==25?(d.m==2?'BULL':'25'):'SDT'[d.m-1]+d.n;
+function route(sc,k,out){const fin={};DL.forEach(d=>{if((out==0||(out==1&&d.m==2)||(out==2&&d.m>=2))&&!fin[d.p])fin[d.p]=d});
+if(fin[sc]&&k>=1)return[fin[sc]];
+if(k>=2)for(const a of DL){const f=fin[sc-a.p];if(sc-a.p>0&&f)return[a,f]}
+if(k>=3)for(const a of DL)for(const b of DL){const r=sc-a.p-b.p;if(r>0&&fin[r])return[a,b,fin[r]]}
+return null}
+/* ===== AutoDart pure geometry: homography, uncertainty zones, blob + tip ===== */
+const CALPTS=[9,99,189,279].map(a=>{const t=a*Math.PI/180;return[Math.sin(t)*B.dout,Math.cos(t)*B.dout]});
+function solve(A,b){const n=b.length;for(let i=0;i<n;i++){let p=i;for(let r=i+1;r<n;r++)if(Math.abs(A[r][i])>Math.abs(A[p][i]))p=r;[A[i],A[p]]=[A[p],A[i]];[b[i],b[p]]=[b[p],b[i]];if(Math.abs(A[i][i])<1e-12)return null;for(let r=i+1;r<n;r++){const f=A[r][i]/A[i][i];for(let c=i;c<n;c++)A[r][c]-=f*A[i][c];b[r]-=f*b[i]}}const x=Array(n).fill(0);for(let i=n-1;i>=0;i--){let s=b[i];for(let c=i+1;c<n;c++)s-=A[i][c]*x[c];x[i]=s/A[i][i]}return x}
+function homog(src,dst){const A=[],b=[];for(let i=0;i<4;i++){const[x,y]=src[i],[u,v]=dst[i];A.push([x,y,1,0,0,0,-u*x,-u*y]);b.push(u);A.push([0,0,0,x,y,1,-v*x,-v*y]);b.push(v)}const h=solve(A,b);return h&&[...h,1]}
+const hap=(H,x,y)=>{const w=H[6]*x+H[7]*y+H[8];return[(H[0]*x+H[1]*y+H[2])/w,(H[3]*x+H[4]*y+H[5])/w]};
+function hinv(H){const[a,b,c,d,e,f,g,h,i]=H,det=a*(e*i-f*h)-b*(d*i-f*g)+c*(d*h-e*g);if(!isFinite(det)||Math.abs(det)<1e-12)return null;return[e*i-f*h,-(b*i-c*h),b*f-c*e,-(d*i-f*g),a*i-c*g,-(a*f-c*d),d*h-e*g,-(a*h-b*g),a*e-b*d]}
+/* nominal scoring + ambiguity flag: true when the tip is within u mm of a ring wire or sector wire */
+function zone(x,y,u){const r=Math.hypot(x,y),h=hit(x,y);let amb=[B.bi,B.bo,B.ti,B.to,B.di,B.dout].some(b=>Math.abs(r-b)<=u);if(r>B.bo&&r<=B.dout+u){const o=(Math.atan2(x,y)*180/Math.PI+369)%18;amb=amb||Math.min(o,18-o)*Math.PI/180*r<=u}return{...h,amb}}
+function blob(m,w,h){const seen=new Uint8Array(w*h);let best=null;for(let i=0;i<w*h;i++){if(!m[i]||seen[i])continue;const st=[i],px=[];seen[i]=1;while(st.length){const p=st.pop();px.push(p);const x=p%w,y=p/w|0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=w||ny>=h)continue;const q=ny*w+nx;if(m[q]&&!seen[q]){seen[q]=1;st.push(q)}}}if(!best||px.length>best.length)best=px}
+if(!best||best.length<12)return null;let sx=0,sy=0;best.forEach(p=>{sx+=p%w;sy+=p/w|0});const n=best.length,cx=sx/n,cy=sy/n;let a=0,b=0,c=0;best.forEach(p=>{const x=p%w-cx,y=(p/w|0)-cy;a+=x*x;b+=x*y;c+=y*y});
+const t=.5*Math.atan2(2*b,a-c),dx=Math.cos(t),dy=Math.sin(t);let lo=1e9,hi=-1e9,w2=0;best.forEach(p=>{const x=p%w-cx,y=(p/w|0)-cy,s=x*dx+y*dy;if(s<lo)lo=s;if(s>hi)hi=s;w2=Math.max(w2,Math.abs(-x*dy+y*dx))});return{n,len:hi-lo,wid:2*w2,e:[[cx+dx*lo,cy+dy*lo],[cx+dx*hi,cy+dy*hi]]}}
+/* heuristic: the tip is the blob end nearer the board centre (assumes a front-facing camera); not a measured claim */
+function tipOf(bl,Hi){const e=bl.e.map(p=>({p,b:hap(Hi,p[0],p[1])}));return Math.hypot(...e[0].b)<=Math.hypot(...e[1].b)?e[0]:e[1]}
+/* ===== Finish assistant (pure): ranked routes + setup/leave suggestions ===== */
+const DPR={20:0,16:1,8:2,10:3,12:4,18:5,4:6,6:7,14:8,2:9,25:3},fpen=(d,out)=>d.m==2?(DPR[d.n]??12):out==0?14:(d.m==3?10:13),spen=d=>d.n==25?(d.m==2?1:3):d.m==3?(d.n==20?0:d.n>=18?1:3):d.m==2?4:5;
+function routesN(sc,k,out,lim=3){const F=d=>out==0||(out==1&&d.m==2)||(out==2&&d.m>=2),fin={};DL.forEach(d=>{if(F(d))(fin[d.p]||(fin[d.p]=[])).push(d)});const R=[],add=a=>R.push({r:a,c:a.length*100+fpen(a[a.length-1],out)+a.slice(0,-1).reduce((s,d)=>s+spen(d),0)});
+if(sc>0){(fin[sc]||[]).forEach(f=>add([f]));if(k>=2)DL.forEach(a=>{if(sc-a.p>0)(fin[sc-a.p]||[]).forEach(f=>add([a,f]))});if(k>=3)DL.forEach(a=>DL.forEach(b=>{const r=sc-a.p-b.p;if(r>0)(fin[r]||[]).forEach(f=>add([a,b,f]))}))}
+R.sort((x,y)=>x.c-y.c);const seen=new Set,o=[];for(const x of R){const key=x.r.slice(0,-1).map(dn).sort().join()+'>'+dn(x.r[x.r.length-1]);if(seen.has(key))continue;seen.add(key);o.push(x.r);if(o.length>=lim)break}return o}
+function setupR(sc,k,out){const C=[];DL.forEach(d=>{const r=sc-d.p;if(r<=(out?1:0))return;let nr=k>=2?routesN(r,k-1,out,1)[0]:null,nx=0;if(!nr){nr=routesN(r,3,out,1)[0];nx=1}if(!nr)return;C.push({d,r,nr,nx,c:spen(d)*3-d.p/4+fpen(nr[nr.length-1],out)*2+(nx?30:0)+nr.length*20})});C.sort((a,b)=>a.c-b.c);return C[0]||null}
+/* ===== Self-tests (pure engine + board hit mapping) ===== */
+function selfTest(){const r=[],ok=(n,c)=>r.push([n,!!c]);
+const mk=(o={},n=2)=>{const s=o.start||501,e=o.inR?0:1;return{id:'t',cfg:{start:s,inR:0,outR:1,legs:1,...o},players:[...Array(n)].map((_,i)=>({n:'P'+i,c:'#fff',score:s,entered:e,legs:0,pts:0,darts:0,hi:0,t180:0})),cur:0,starter:0,leg:1,visit:[],vs:{score:s,entered:e},pend:null,over:0,events:[]}};
+const T=(g,a)=>{a.forEach(([s,m])=>{if(!g.pend)applyDart(g,s,m,0,0,1)});return g};
+const P=(i,r,o=0)=>{const t=(i*18+o)*Math.PI/180;return hit(Math.sin(t)*r,Math.cos(t)*r)};
+let a=true;ORDER.forEach((n,i)=>{const s=P(i,130),t=P(i,103),d=P(i,166);if(!(s.seg==n&&s.m==1&&t.seg==n&&t.m==3&&d.seg==n&&d.m==2&&P(i,60).seg==n&&P(i,130,8.9).seg==n&&P(i,130,-8.9).seg==n))a=false});ok('20 sectors: order, rings, edges',a);
+[[3,25,2],[6.35,25,2],[6.36,25,1],[15.9,25,1],[15.91,20,1],[99,20,1],[99.01,20,3],[107,20,3],[107.01,20,1],[162,20,1],[162.01,20,2],[170,20,2],[170.01,0,0],[260,0,0]].forEach(([d,s,m])=>{const h=hit(0,d);ok('boundary r='+d,h.seg==s&&h.m==m)});
+let g=T(mk(),[[20,3],[20,3],[20,3]]);ok('normal 180',g.players[0].score==321&&g.pend=='full');finish(g);ok('player rotation',g.cur==1&&!g.visit.length);
+g=T(mk({start:40}),[[20,3]]);ok('bust below zero restores',g.pend=='bust'&&g.players[0].score==40);
+g=T(mk({start:21}),[[20,1]]);ok('leaving 1 busts',g.pend=='bust'&&g.players[0].score==21);
+g=T(mk({start:20}),[[20,1]]);ok('zero without double busts',g.pend=='bust');
+g=T(mk({start:20}),[[10,2]]);ok('double out wins',g.pend=='win'&&g.players[0].score==0);
+g=T(mk({start:50}),[[25,2]]);ok('bull finishes double out',g.pend=='win');
+g=T(mk({start:60,outR:2}),[[20,3]]);ok('master out: treble wins',g.pend=='win');
+g=T(mk({start:60}),[[20,3]]);ok('double out: treble busts',g.pend=='bust');
+g=T(mk({start:20,outR:0}),[[20,1]]);ok('straight out wins',g.pend=='win');
+g=T(mk({inR:1}),[[20,1],[20,3],[20,2]]);ok('double in',g.players[0].score==461&&g.players[0].entered==1);
+g=T(mk({inR:2}),[[20,1],[25,1],[10,3]]);ok('master in',g.players[0].score==471&&g.players[0].entered==1);
+g=T(mk(),[[0,0]]);ok('miss uses a dart',g.visit.length==1&&g.players[0].score==501&&g.players[0].darts==1);
+g=T(mk({start:50}),[[20,1],[20,3]]);ok('bust reverses whole visit',g.players[0].score==50&&g.players[0].pts==0);
+g=T(mk({start:20}),[[10,2]]);finish(g);ok('match over',g.over==1&&g.players[0].legs==1);
+g=T(mk({start:20,legs:2}),[[10,2]]);finish(g);ok('new leg rotates starter',!g.over&&g.leg==2&&g.cur==1&&g.players[1].score==20);
+g=T(mk({start:40}),[[20,2]]);ok('average uses darts thrown',g.players[0].pts/g.players[0].darts*3==120);
+ok('checkout 170',route(170,3,1).map(dn).join()=='T20,T20,BULL');ok('no 169 checkout',!route(169,3,1));ok('D20 with one dart',dn(route(40,1,1)[0])=='D20');
+const Dq=[[320,40],[600,260],[330,470],[60,250]],Hh=homog(CALPTS,Dq),Hv=hinv(Hh);let er=0;CALPTS.forEach((p,i)=>{const[u,v]=hap(Hh,...p);er=Math.max(er,Math.hypot(u-Dq[i][0],v-Dq[i][1]))});const rt2=hap(Hv,...hap(Hh,30,40));
+ok('homography maps the 4 calibration wires',er<1e-6);ok('homography inverse round-trips',Math.hypot(rt2[0]-30,rt2[1]-40)<1e-6);ok('perspective keeps bull at 0 mm',Math.hypot(...hap(Hv,...hap(Hh,0,0)))<1e-6);
+ok('calibration wires sit at sector boundaries (20|1 at top)',zone(CALPTS[0][0],CALPTS[0][1],2).amb&&Math.abs(Math.hypot(...CALPTS[0])-B.dout)<1e-9);
+ok('zone: near treble wire is ambiguous',zone(0,100.5,2).amb);ok('zone: clear single is not ambiguous',!zone(0,130,2).amb&&zone(0,130,2).seg==20);
+ok('zone: near sector wire is ambiguous',zone(Math.sin(9*Math.PI/180)*130,Math.cos(9*Math.PI/180)*130,2).amb);ok('zone: mid-sector is not ambiguous',!zone(Math.sin(4.5*Math.PI/180)*130,Math.cos(4.5*Math.PI/180)*130,2).amb);
+ok('zone: far outside is a clear miss',zone(0,200,2).seg==0&&!zone(0,200,2).amb);
+const bw=64,bm=new Uint8Array(bw*bw);for(let t=10;t<=40;t++)bm[t*bw+t]=1;const bb=blob(bm,bw,bw),Hp=homog([[-160,160],[160,160],[160,-160],[-160,-160]],[[0,0],[64,0],[64,64],[0,64]]),tp=bb&&tipOf(bb,hinv(Hp));
+ok('blob finds an elongated diagonal object',bb&&bb.len>40&&bb.n==31);ok('tip is the end nearest the board centre',tp&&Math.hypot(tp.b[0]-40,tp.b[1]+40)<6);ok('blob ignores specks',blob(new Uint8Array(64*64).fill(0),64,64)===null);
+const RN=(s,k,o,l)=>routesN(s,k,o,l).map(r=>r.map(dn).join(' '));
+ok('assistant: 170 = T20 T20 BULL',RN(170,3,1)[0]=='T20 T20 BULL');ok('assistant: 40 = D20',RN(40,3,1)[0]=='D20');ok('assistant: 32 = D16',RN(32,3,1)[0]=='D16');ok('assistant: 100 in 2 darts = T20 D20',RN(100,2,1)[0]=='T20 D20');
+ok('assistant: 1 left cannot finish on double out',RN(1,3,1).length==0);ok('assistant: straight out 1 = S1',RN(1,3,0)[0]=='S1');ok('assistant: master out 60 = T20',RN(60,1,2)[0]=='T20');ok('assistant: no 169 finish',RN(169,3,1).length==0);
+ok('assistant: alternatives are distinct',new Set(RN(100,3,1,3)).size==RN(100,3,1,3).length&&RN(100,3,1,3).length==3);ok('assistant: setup exists above 170',!!setupR(200,3,1));
+const s41=setupR(41,1,1);ok('assistant: 41 with one dart leaves a one-dart finish',s41&&s41.nr.length==1);return r}
+function rt(){const r=selfTest(),f=r.filter(x=>!x[1]);$('#tr').innerHTML=(r.length-f.length)+'/'+r.length+' tests passed'+f.map(x=>'<div>✗ '+esc(x[0])+'</div>').join('')}
+/* ===== State, persistence ===== */
+const K='dartscope-g',$=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+let G=null,H=[],PS=[],ovx=0,tm,lock=false,km=1,names=['Player 1','Player 2'],C={start:501,inR:0,outR:1,legs:3};
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(G))}catch(e){}try{localStorage.setItem('dartscope-h',JSON.stringify(H.slice(-80)))}catch(e){}};addEventListener('pagehide',()=>{if(G)save()});
+const snap=()=>{H.push(JSON.stringify(Object.assign({},G,{events:G.events.length})));if(H.length>300)H.shift()};
+function undo(){if(!H.length)return;clearTimeout(tm);const s=JSON.parse(H.pop());G.events.length=s.events;s.events=G.events;G=s;lock=false;if(G.pend)tm=setTimeout(fin,1000);sync();ui();save()}
+function fin(){clearTimeout(tm);if(!G||G.over)return;snap();finish(G);if(G.over){ovx=0;hist()}sync();ui();save()}
+function hist(){try{let h=JSON.parse(localStorage.getItem('dartscope-hist')||'[]'),w=G.players.reduce((a,b)=>b.legs>a.legs?b:a);
+h=h.filter(x=>x.id!=G.id);h.push({id:G.id,d:new Date().toLocaleDateString(),m:G.cfg.start,w:w.n,p:G.players.map(p=>({n:p.n,l:p.legs,a:p.darts?+(p.pts/p.darts*3).toFixed(1):0,hi:p.hi}))});localStorage.setItem('dartscope-hist',JSON.stringify(h.slice(-50)));
+const e=JSON.parse(localStorage.getItem('dartscope-ev')||'[]').filter(v=>v.m!=G.id).concat(G.events.map(v=>({...v,n:G.players[v.p].n})));for(let n=8000;n>=500;n=n/2|0){try{localStorage.setItem('dartscope-ev',JSON.stringify(e.slice(-n)));break}catch(x){}}}catch(e){}}
+const canIn=()=>G&&!G.over&&!G.pend&&G.visit.length<3&&!lock;
+function record(seg,m,x,y,k){if(!canIn())return;snap();lock=true;setTimeout(()=>lock=false,450);const st=applyDart(G,seg,m,x,y,k),d=G.visit[G.visit.length-1];
+toast(st=='bust'?'BUST':st=='win'?'LEG WON '+lbl(d):d.miss?'MISS · 0':lbl(d)+' · '+d.pts,st=='bust'?'#ff4d6d':st=='win'?'#34e08a':'#fff');
+sync(true);ui();save();if(G.pend)tm=setTimeout(fin,G.pend=='bust'?1500:1000)}
+const lbl=d=>d.miss?'MISS':d.seg==25?(d.m==2?'BULL':'25'):'SDT'[d.m-1]+d.seg;
+let tt;function toast(t,c){const e=$('#toast');e.textContent=t;e.style.color=c;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),1100)}
+/* ===== UI ===== */
+const HINT=['Straight: no restriction.','Double: must start with a double.','Master: start with a double, treble or bull.'],HO=['Straight out: reaching exactly 0 wins.','Double out: finish on a double or bull. Passing 0, or leaving 1, is a bust.','Master out: finish on a double, treble or bull. Leaving 1 is a bust.'];
+function sv(){const sel=(id,o,v)=>`<select id="${id}" onchange="cf('${id}',this.value)">${o.map(([a,b])=>`<option value="${a}"${a==v?' selected':''}>${b}</option>`).join('')}</select>`;
+let h='';try{h=JSON.parse(localStorage.getItem('dartscope-hist')||'[]').slice(-5).reverse().map(x=>`<div class="m">${x.d} · ${x.m} · won by ${esc(x.w)}</div>`).join('')}catch(e){}
+$('#s').innerHTML=`<h1>Dart<i>Scope</i></h1>${G&&!G.over?'<button class="pri" onclick="go()">▶ Resume match</button>':''}
+<b>Players (${names.length}/8)</b>${names.map((n,i)=>`<div class="pn"><input value="${esc(n)}" maxlength="14" aria-label="Player ${i+1} name" oninput="names[${i}]=this.value"><button onclick="rm(${i})" ${names.length<2?'disabled':''} aria-label="Remove">✕</button></div>`).join('')}
+<button onclick="add()" ${names.length>=8?'disabled':''}>+ Add player</button>
+<div class="g2">${sel('start',[301,501,701,901,1001].map(v=>[v,v]),C.start)}${sel('legs',[1,2,3,4,5,7].map(v=>[v,'First to '+v]),C.legs)}${sel('inR',[[0,'Straight in'],[1,'Double in'],[2,'Master in']],C.inR)}${sel('outR',[[0,'Straight out'],[1,'Double out'],[2,'Master out']],C.outR)}</div>
+<small>${HINT[C.inR]} ${HO[C.outR]}</small><button class="pri" onclick="start()">Start match</button>
+${h?'<b>Recent matches</b>'+h:''}<button onclick="camOpen()">📷 AutoDart camera</button><button class="pri" onclick="AB=0;openAn()">📊 Analytics &amp; heatmap</button><button onclick="rt()">Run self-tests</button><div id="tr" class="m" role="status"></div><small>Cricket, Around the Clock, analytics and heatmaps are the next phases.</small>`}
+const cf=(k,v)=>{C[k=='start'?'start':k]=+v;sv()},add=()=>{names.push('Player '+(names.length+1));sv()},rm=i=>{names.splice(i,1);sv()};
+function start(){const n=names.map((x,i)=>x.trim()||'Player '+(i+1));
+G={id:Date.now().toString(36),cfg:{...C},players:n.map((x,i)=>({n:x,c:COL[i],score:C.start,entered:C.inR?0:1,legs:0,pts:0,darts:0,hi:0,t180:0})),cur:0,starter:0,leg:1,visit:[],vs:{score:C.start,entered:C.inR?0:1},pend:null,over:0,events:[]};H=[];save();try{localStorage.setItem('dartscope-cfg',JSON.stringify({names,C}))}catch(e){}go()}
+function go(){$('#s').hidden=1;$('#g').hidden=0;mfo();fit();sync();ui();if(G.pend&&!G.over)tm=setTimeout(fin,600)}
+function menu(){$('#g').hidden=1;$('#s').hidden=0;sv()}
+function ui(){const g=G,p=g.players[g.cur],left=3-g.visit.length,sum=g.visit.reduce((a,d)=>a+d.pts,0);
+$('#info').textContent=`${g.cfg.start} · First to ${g.cfg.legs} · Leg ${g.leg}`;
+$('#cards').innerHTML=g.players.map((q,i)=>`<div class="card${i==g.cur?' on':''}" style="--c:${q.c}"><b>${esc(q.n)}</b>${i==g.cur?' ●':''}<div class="sc${PS[i]!==undefined&&PS[i]!==q.score?' pop':''}">${q.score}</div><small>Legs ${q.legs} · Avg ${q.darts?(q.pts/q.darts*3).toFixed(1):'–'}</small></div>`).join('');
+PS=g.players.map(q=>q.score);const on=document.querySelector('.card.on');if(on)on.scrollIntoView({inline:'center',block:'nearest'});
+$('#sl').innerHTML=[0,1,2].map(i=>{const d=g.visit[i];return`<div class="sl${d?(d.miss?' f x':' f'):''}">${d?`<b>${lbl(d)}</b><br><small>${d.pts}</small>`:'<small>–<br>dart '+(i+1)+'</small>'}</div>`}).join('');
+$('#vt').textContent=g.pend=='bust'?'BUST':sum;
+let c='';if(!g.over&&!g.pend){if(!p.entered)c='Needs '+(g.cfg.inR==1?'a double':'a double, treble or bull')+' to start';else if(p.score<=170&&left>0){const r=route(p.score,left,g.cfg.outR);c=r?'Checkout: '+r.map(dn).join(' → '):'No checkout with '+left+' dart'+(left>1?'s':'')}}
+assist(g,p,left);$('#nx').textContent=g.over?'Results':'Next';$('#un').disabled=!H.length;
+$('#ov').hidden=!g.over||ovx||AN;if(g.over){const w=g.players.reduce((a,b)=>b.legs>a.legs?b:a);
+$('#ov').innerHTML=`<div class="bx"><button class="xb" onclick="ovx=1;ui()" aria-label="Close results">✕</button><h2>🏆 ${esc(w.n)} wins</h2><table><tr><th>Player</th><th>Legs</th><th>Avg</th><th>Best</th><th>180s</th></tr>${g.players.map(q=>`<tr><td>${esc(q.n)}</td><td>${q.legs}</td><td>${q.darts?(q.pts/q.darts*3).toFixed(1):'–'}</td><td>${q.hi}</td><td>${q.t180}</td></tr>`).join('')}</table>
+<small>${g.events.length} darts recorded for analysis.</small><button class="pri" onclick="AB=1;openAn()">📊 Match analysis</button><button onclick="again()">Rematch</button><button onclick="undo()">↶ Undo last dart</button><button onclick="menu()">Menu</button><button onclick="ovx=1;ui()">Close</button></div>`}}
+function again(){C={...G.cfg};names=G.players.map(p=>p.n);start()}
+/* ===== Keypad ===== */
+$('#nums').innerHTML=[...Array(20)].map((_,i)=>`<button onclick="kp(${i+1})">${i+1}</button>`).join('');
+function kxy(seg,m){const t=ORDER.indexOf(seg)*Math.PI/10,r=seg==25?(m==2?0:11):m==3?103:m==2?166:133;return[Math.sin(t)*r,Math.cos(t)*r]}
+function kp(s){if(s==25&&km==3)return;const m=s==25?(km==2?2:1):km,[x,y]=kxy(s,m);record(s,m,x,y,1);sm(1)}
+function bull(){const[x,y]=kxy(25,2);record(25,2,x,y,1);sm(1)}
+function miss(){const a=Math.random()*6.28;record(0,0,Math.sin(a)*200,Math.cos(a)*200,1)}
+function sm(m){km=m;document.querySelectorAll('.mu').forEach(b=>b.classList.toggle('on',+b.dataset.m==km));$('#k25').disabled=km==3;$('#pv').textContent='Next keypad dart: '+['','Single ×1','Double ×2','Treble ×3 (no 25)'][km]}
+$('#kb').onclick=()=>{$('#kp').hidden=!$('#kp').hidden;sm(km);fit()};$('#un').onclick=undo;$('#nx').onclick=()=>{if(G.over){ovx=0;ui()}else fin()};$('#mn').onclick=menu;$('#md').onclick=()=>setTwo(!two);
+/* ===== 2D mode, manual visit entry ===== */
+let two=false,BC=null,ZT=1,FX=0,FY=0,PK=0,DG=0,PD=null,ZI=0,LK=null;const c2=$('#c2'),x2=c2.getContext('2d');
+/* zoom (pick a spot, then 2.4x, 3.8x, reset), drag to pan, focus mode */
+const ZL=[1,2.4,3.8];
+function clampF(){const m=B.face*(1-1/ZT),d=Math.hypot(FX,FY);if(d>m){FX*=m/d;FY*=m/d}}
+function zTo(x,y){PK=0;ZI=1;ZT=ZL[1];FX=x;FY=y;clampF();zUI()}
+function zoom(){if(PK)PK=0;else if(ZI==0)PK=1;else if(ZI==1){ZI=2;ZT=ZL[2];clampF()}else{ZI=0;ZT=1;FX=FY=0}zUI()}
+function zUI(){const b=$('#zb');b.classList.toggle('on',ZI>0||!!PK);b.textContent=PK?'tap':ZI?ZL[ZI]+'×':'🔍';if(PK)toast('Tap the area to zoom into','#fff');d2()}
+function fsm(){const on=$('#g').classList.toggle('fs');$('#fb').setAttribute('aria-pressed',on);$('#fb').classList.toggle('on',on);fit()}
+$('#zb').onclick=zoom;$('#fb').onclick=fsm;
+[$('#cv'),c2].forEach(el=>{el.addEventListener('pointerdown',e=>{PD={x:e.clientX,y:e.clientY};DG=0});
+el.addEventListener('pointermove',e=>{if(!PD||ZT<=1||PK||!e.buttons)return;const dx=e.clientX-PD.x,dy=e.clientY-PD.y;if(!DG&&Math.hypot(dx,dy)<8)return;DG=1;
+const w=el===c2?B.face/(Math.min(el.clientWidth,el.clientHeight)/2*.98*ZT):2*(D/ZT)*Math.tan(.31416)/el.clientHeight;FX-=dx*w;FY+=dy*w;clampF();PD={x:e.clientX,y:e.clientY};d2()})});
+function setTwo(v){two=!!v;$('#cv').hidden=two;c2.hidden=!two;$('#tl').disabled=two;$('#md').textContent=two?'3D':'2D';d2()}
+function d2(){if(!two||!BC)return;const w=c2.clientWidth,h=c2.clientHeight,q=devicePixelRatio||1;if(!w||!h)return;c2.width=w*q;c2.height=h*q;const z=ZT,R=Math.min(w,h)*q/2*.98*z,s=R/B.face,cx=w*q/2-FX*s,cy=h*q/2+FY*s;x2.drawImage(BC,cx-R,cy-R,2*R,2*R);if(AN){x2.globalAlpha=HP*.92;x2.drawImage(HC,cx-R,cy-R,2*R,2*R);x2.globalAlpha=1}if(HLon&&!AN)x2.drawImage(HLC,cx-R,cy-R,2*R,2*R);
+if(G&&!AN)G.visit.forEach((d,i)=>{const px=cx+d.x*s,py=cy-d.y*s;x2.beginPath();x2.arc(px,py,8*q,0,7);x2.fillStyle=G.players[G.cur].c;x2.fill();x2.lineWidth=2*q;x2.strokeStyle='#fff';x2.stroke();x2.fillStyle='#fff';x2.font='bold '+11*q+'px system-ui';x2.textAlign='center';x2.fillText(i+1,px,py+4*q)})}
+c2.addEventListener('pointerup',e=>{if(DG){DG=0;return}if(!AN&&!canIn()&&!PK)return;const r=c2.getBoundingClientRect(),s=Math.min(r.width,r.height)/2*.98/B.face*ZT,x=(e.clientX-r.left-r.width/2)/s+FX,y=-(e.clientY-r.top-r.height/2)/s+FY,o=hit(x,y);if(PK)return zTo(x,y);if(AN)return segInfo(o);record(o.seg,o.m,x,y,0)});
+function wallTex(){const g=document.createElement('canvas');g.width=g.height=512;const q=g.getContext('2d'),r=q.createRadialGradient(256,256,0,256,256,256);r.addColorStop(0,'#2b2f78');r.addColorStop(.35,'#12163a');r.addColorStop(1,'#05070f');q.fillStyle=r;q.fillRect(0,0,512,512);const t=new THREE.CanvasTexture(g);t.encoding=THREE.sRGBEncoding;return t}
+function mfo(){const o=G.cfg.outR;$('#mf').innerHTML='<option value="">Not a checkout</option>'+DL.filter(d=>o==0||(o==1&&d.m==2)||(o==2&&d.m>=2)).map(d=>`<option>${dn(d)}</option>`).join('')}
+function man(){const p=G.players[G.cur],mm=t=>{$('#mm').textContent=t};if(!canIn()||G.visit.length)return mm('Finish or undo the current visit first.');
+const t=+$('#mt').value,n=+$('#mn2').value,f=$('#mf').value,fd=f?DL.find(d=>dn(d)==f):null;
+if(!$('#mt').value||!Number.isInteger(t)||t<0||t>180)return mm('Enter a total from 0 to 180.');if(!p.entered)return mm('Use the board or keypad until you are in.');
+if(fd&&t!=p.score)return mm('A checkout total must equal the remaining '+p.score+'.');if(!fd&&t==p.score)return mm('That total finishes the leg. Pick the finishing dart.');
+if(fd&&t>fd.p&&n<2)return mm('Use at least 2 darts for that total.');
+snap();(fd?[[t-fd.p,1],[fd.n,fd.m]]:[[t,1]]).forEach(([s,m],i)=>{if(!G.pend&&!(fd&&i==0&&!s))applyDart(G,s,m,0,0,2)});
+const st=G.pend||'full';G.pend=st;const xd=Math.max(0,n-G.visit.length);p.darts+=xd;G.events[G.events.length-1].xd=xd;finish(G);if(G.over){ovx=0;hist()}$('#mt').value='';mm('');sync();ui();save();toast(st=='bust'?'BUST':st=='win'?'LEG WON':'+'+t,st=='bust'?'#ff4d6d':st=='win'?'#34e08a':'#fff')}
+/* ===== Analytics (events -> stats -> animated board heatmap) ===== */
+let AN=0,HP=0,AT=0,HM=null,CU={seg:{}},AP=null,AL='dens',AS='all',AB=0;const HC=document.createElement('canvas');
+const LY=[['dens','Density'],['seg','Segments'],['miss','Misses'],['dbl','Doubles'],['tre','Trebles']],LG={dens:'Hotter = more darts landed (tapped positions only).',seg:'Numbers = darts per segment (keypad darts included).',miss:'Dots = darts outside the scoring area (tapped only).',dbl:'Brighter = more doubles hit.',tre:'Brighter = more trebles hit.'},L8=['0-19','20-39','40-59','60-79','80-99','100-139','140-179','180'];
+function evs(){let e=[];try{e=JSON.parse(localStorage.getItem('dartscope-ev')||'[]')}catch(x){}if(G&&!G.over)e=e.concat(G.events.map(v=>({...v,n:G.players[v.p].n})));return e.map(v=>({...v,n:v.n||'Player '+(v.p+1)}))}
+//CALC
+function calc(es){const V=[];let c=null;es.forEach(e=>{if(e.dn==1||!c||c.m!=e.m){c={m:e.m,l:e.leg,p:0,n:0,b:0};V.push(c)}c.p+=e.pts;c.n+=1+(e.xd||0);if(e.bust)c.b=1});V.forEach(v=>v.s=v.b?0:v.p);
+const dn=V.reduce((a,v)=>a+v.n,0),pts=V.reduce((a,v)=>a+v.s,0),f={},f9=[0,0];V.forEach(v=>{const k=v.m+v.l,q=f[k]=(f[k]||0)+1;if(q<=3){f9[0]+=v.s;f9[1]+=v.n}});
+const sg=es.filter(e=>e.k<2&&e.seg<=25),att=es.filter(e=>e.k<2&&e.from>0&&(e.from==50||(e.from<=40&&e.from%2==0))),seg={};
+sg.forEach(e=>{const o=seg[e.seg]||(seg[e.seg]={n:0,p:0,d:0,t:0});o.n++;o.p+=e.pts;if(e.mult==2)o.d++;if(e.mult==3)o.t++});
+const mean=V.length?pts/V.length:0,sd=Math.sqrt(V.reduce((a,v)=>a+(v.s-mean)**2,0)/(V.length||1)),bk=[0,20,40,60,80,100,140,180].map((lo,i,a)=>V.filter(v=>i==7?v.s>=180:v.s>=lo&&v.s<a[i+1]).length);
+const top=Object.entries(seg).filter(([k])=>k>0&&k!=25).sort((a,b)=>b[1].n-a[1].n)[0];
+return{dn,avg:dn?pts/dn*3:0,f9:f9[1]?f9[0]/f9[1]*3:0,hi:Math.max(0,...V.map(v=>v.s)),n180:V.filter(v=>v.s==180).length,n140:V.filter(v=>v.s>=140).length,n100:V.filter(v=>v.s>=100).length,att:att.length,hit:att.filter(e=>e.done).length,ms:sg.filter(e=>e.seg==0).length,sgn:sg.length,seg,vs:V.map(v=>v.s),bk,sd,mean,top,V:V.length,tr:sg.filter(e=>e.mult==3).length}}
+//ENDCALC
+function heat(es,L){const S=1024,x=HC.getContext('2d'),h=S/2,k=h/B.face,A=i=>(i*18-99)*Math.PI/180;HC.width=HC.height=S;const sg=CU.seg,val=o=>L=='dbl'?o.d:L=='tre'?o.t:o.n,mx=Math.max(1,...Object.entries(sg).filter(([s])=>s>0).map(([,o])=>val(o)));
+const W=(i,r0,r1,f,n)=>{x.fillStyle=`hsla(${190-150*f},90%,55%,${.2+.6*f})`;x.beginPath();x.arc(h,h,r1*k,A(i),A(i)+Math.PI/10);x.arc(h,h,r0*k,A(i)+Math.PI/10,A(i),true);x.fill();if(n!=null){x.fillStyle='#fff';x.font='bold '+15*k+'px system-ui';x.textAlign='center';x.textBaseline='middle';const t=i*Math.PI/10,r=(r0+r1)/2;x.fillText(n,h+Math.sin(t)*r*k,h-Math.cos(t)*r*k)}};
+if(L!='seg'&&L!='dbl'&&L!='tre'){x.fillStyle='rgba(4,6,18,.45)';x.beginPath();x.arc(h,h,h,0,7);x.fill()}
+if(L=='seg'||L=='dbl'||L=='tre')ORDER.forEach((n,i)=>{const o=sg[n],v=o?val(o):0;if(v)W(i,L=='dbl'?B.di:L=='tre'?B.ti:B.bo,L=='tre'?B.to:B.dout,v/mx,L=='seg'?v:null)});
+if(L=='dens'){x.globalCompositeOperation='lighter';es.forEach(e=>{if(e.k)return;const px=h+e.x*B.dout*k,py=h-e.y*B.dout*k,g=x.createRadialGradient(px,py,0,px,py,26*k);g.addColorStop(0,'rgba(255,210,60,.55)');g.addColorStop(.5,'rgba(255,45,154,.28)');g.addColorStop(1,'rgba(255,45,154,0)');x.fillStyle=g;x.fillRect(px-26*k,py-26*k,52*k,52*k)});x.globalCompositeOperation='source-over'}
+if(L=='miss')es.forEach(e=>{if(e.k||!e.miss)return;x.fillStyle='rgba(255,60,90,.92)';x.beginPath();x.arc(h+e.x*B.dout*k,h-e.y*B.dout*k,7*k,0,7);x.fill();x.strokeStyle='#fff';x.lineWidth=k;x.stroke()});
+if(HM)HM.material.map.needsUpdate=true}
+function cnt(){const t0=performance.now(),els=[...document.querySelectorAll('.cu')];(function f(){const p=RM?1:Math.min(1,(performance.now()-t0)/900),e=1-Math.pow(1-p,3);els.forEach(el=>el.textContent=(+el.dataset.v*e).toFixed(+el.dataset.d));if(p<1)requestAnimationFrame(f)})();
+document.querySelectorAll('.bar i').forEach(i=>requestAnimationFrame(()=>requestAnimationFrame(()=>i.style.width=i.dataset.w+'%')))}
+function renderAn(){const all=evs(),nm=[...new Set(all.map(e=>e.n))],ap=$('#ap');
+if(!nm.length){CU={seg:{}};heat([],AL);ap.innerHTML='<p class="m">No darts recorded yet. Play a match first.</p><button onclick="closeAn()">← Back</button>';return}
+if(!nm.includes(AP))AP=nm[0];const es=all.filter(e=>e.n==AP&&(AS!='cur'||(G&&e.m==G.id))),s=calc(es);CU=s;heat(es,AL);AT=performance.now();AN=1;
+const T=[['3-dart avg',s.avg,1,s.dn+' darts'],['First 9',s.f9,1,'per leg'],['Best visit',s.hi,0,''],['180s',s.n180,0,s.n140+' × 140+'],['100+ visits',s.n100,0,'of '+s.V],['Checkout %',s.att?s.hit/s.att*100:0,0,s.att?s.hit+'/'+s.att+' finish darts':'no finish darts'],['Miss rate %',s.sgn?s.ms/s.sgn*100:0,0,s.ms+'/'+s.sgn+' darts'],['Trebles',s.tr,0,(s.sgn?(s.tr/s.sgn*100).toFixed(0):0)+'% of darts'],['Spread (SD)',s.sd,0,'lower = steadier']];
+const mxv=Math.max(1,...s.bk),vs=s.vs.slice(-30),mv=Math.max(60,...vs),pts=vs.map((v,i)=>(vs.length>1?i/(vs.length-1)*296+2:150)+','+(58-v/mv*54)).join(' '),tips=[];
+if(s.dn<9)tips.push('Observed: only '+s.dn+' darts so far. Play more for reliable insights.');else{
+if(s.att>=5)tips.push(`Observed: ${s.hit}/${s.att} finish attempts (${(s.hit/s.att*100).toFixed(0)}%).`+(s.att<10?' Small sample.':s.hit/s.att<.2?' Suggestion: a 10-minute doubles drill.':''));
+if(s.top&&s.top[1].n>=6)tips.push(`Observed: most-hit segment is ${s.top[0]} (${s.top[1].n} darts, avg ${(s.top[1].p/s.top[1].n).toFixed(1)}).`);
+if(s.sgn>=15&&s.ms/s.sgn>.2)tips.push(`Observed: ${(s.ms/s.sgn*100).toFixed(0)}% of darts missed the board. Suggestion: work on grouping.`);
+if(s.V>=5)tips.push(`Observed: visit scores vary by ±${s.sd.toFixed(0)} around ${s.mean.toFixed(0)}.`)}
+ap.innerHTML=`<div class="kr ch">${nm.map(n=>`<button class="${n==AP?'on':''}" data-n="${esc(n)}" onclick="AP=this.dataset.n;renderAn()">${esc(n)}</button>`).join('')}<button class="${AS=='all'?'on':''}" onclick="AS='all';renderAn()">All matches</button><button class="${AS=='cur'?'on':''}" onclick="AS='cur';renderAn()" ${G?'':'disabled'}>This match</button></div>
+<div class="kr ch">${LY.map(([k,t])=>`<button class="${k==AL?'on':''}" onclick="AL='${k}';renderAn()">${t}</button>`).join('')}</div><small id="sd">${LG[AL]} Tap a segment for details.</small>
+<div id="tiles">${T.map(([a,v,d,b])=>`<div class="tl"><small>${a}</small><b class="cu" data-v="${v}" data-d="${d}">0</b><small>${b}</small></div>`).join('')}</div>
+${s.bk.map((v,i)=>`<div class="br"><small>${L8[i]}</small><div class="bar"><i data-w="${v/mxv*100}"></i></div><small>${v}</small></div>`).join('')}
+<svg viewBox="0 0 300 60" id="sp" role="img" aria-label="Visit scores over time"><polyline class="sp" pathLength="1" points="${pts}" fill="none" stroke="#2d8cff" stroke-width="2"/></svg>
+${tips.map(t=>`<div class="tp">${t}</div>`).join('')}<button onclick="closeAn()">← Back</button>`;cnt()}
+function segInfo(o){const s=CU.seg[o.seg]||{n:0,p:0,d:0,t:0};$('#sd').textContent=o.seg?`Segment ${o.seg==25?'Bull':o.seg}: ${s.n} darts, avg ${s.n?(s.p/s.n).toFixed(1):'–'} pts, ${s.d} doubles, ${s.t} trebles.`:`Off the board: ${s.n} darts.`}
+function openAn(){$('#ov').hidden=1;if(HL)HL.visible=false;HLon=false;AS=AB&&G?'cur':'all';$('#s').hidden=1;$('#g').hidden=0;$('#g').classList.add('an');$('#ap').hidden=0;D3.forEach(m=>m.visible=false);if(HM)HM.visible=true;fit();renderAn()}
+function closeAn(){AN=0;$('#g').classList.remove('an');$('#ap').hidden=1;D3.forEach(m=>m.visible=true);if(HM){HM.visible=false;HM.material.opacity=0}if(AB&&G)go();else menu()}
+/* ===== AutoDart runtime: camera, calibration, detection, confirmation ===== */
+const AD={u:5,thr:30,mot:.004,stable:5,minElong:3,mpp:1.2},CM=['1/4: tap the OUTER edge of the double ring on the wire between 20 and 1 (top).','2/4: same, on the wire between 6 and 10 (right).','3/4: same, on the wire between 3 and 19 (bottom).','4/4: same, on the wire between 11 and 14 (left).','5/5: tap the exact bull centre to verify the calibration.'];
+let CS=null,WL=null,PW=640,PH=360,CH=null,Hi=null,CALOK=false,CQ=0,CALP=[],calOn=false,RI=null,GR=null,PG=null,BL=null,SG=null,DET=null,AST='off',stab=0,RB=1,DID=0,tmr=0,PL=0,AM='b',VF=0;
+try{AM=localStorage.getItem('dartscope-am')||'b'}catch(e){}
+const vd=$('#vd'),vo=$('#vo'),pc=document.createElement('canvas'),pcx=pc.getContext('2d',{willReadFrequently:true}),adS=t=>{$('#ast').textContent=t;stepUI()};
+const EMB='Live camera is blocked inside this embedded view, so Safari cannot show a permission prompt. Open the link below in its own Safari tab, or host the file over HTTPS (see Camera help). You can still analyse a recorded video.';
+let FM='environment';document.body.appendChild($('#ad'));
+function camBlocked(){const p=document.permissionsPolicy||document.featurePolicy;return !!(p&&p.allowsFeature&&!p.allowsFeature('camera'))}
+function stepUI(){const s=(!CS&&!VF)?1:!CALOK?2:3;document.querySelectorAll('#stp i').forEach((e,i)=>{e.className=i+1<s?'dn':i+1==s?'on':''})}
+function linkUI(){$('#alk').hidden=window.top===window;$('#alu').value=location.href}
+function openFull(){let w=null;try{w=window.open(location.href,'_blank')}catch(e){}if(!w)adS('The new tab was blocked. Use Copy / share, then paste the link into Safari.')}
+async function copyLink(){const u=location.href;try{if(navigator.share){await navigator.share({title:'DartScope',url:u});return}}catch(e){}try{await navigator.clipboard.writeText(u);adS('Link copied. Paste it into the Safari address bar.')}catch(e){$('#alu').select();adS('Select the link, copy it, then open it in Safari.')}}
+function camOpen(){const a=$('#ad');a.hidden=0;a.classList.remove('mini');$('#am').value=AM;linkUI();stepUI();if(camBlocked()||!navigator.mediaDevices)adS(EMB)}
+function adMini(){const a=$('#ad');a.classList.remove('full');a.classList.toggle('mini')}
+function adFull(){const a=$('#ad');a.classList.remove('mini');a.classList.toggle('full')}
+function camHalt(){clearInterval(tmr);if(CS)CS.getTracks().forEach(t=>t.stop());CS=null;vd.srcObject=null;if(VF){URL.revokeObjectURL(vd.src);vd.removeAttribute('src');VF=0}try{WL&&WL.release()}catch(e){}WL=null;AST='off';GR=PG=BL=null}
+function camStop(){camHalt();const a=$('#ad');a.hidden=1;a.classList.remove('full','mini');adS('Camera off.')}
+function camFlip(){FM=FM=='environment'?'user':'environment';if(CS)camStart();else adS('Camera set to '+(FM=='user'?'front':'rear')+'. Tap Start camera.')}
+async function camStart(){camHalt();linkUI();if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return adS(EMB);
+const t0=performance.now(),tries=[{video:{facingMode:{ideal:FM},width:{ideal:1920},height:{ideal:1080}},audio:false},{video:{facingMode:FM},audio:false},{video:true,audio:false}];
+for(const c of tries){try{CS=await navigator.mediaDevices.getUserMedia(c);break}catch(e){CS=null;if(e.name=='NotAllowedError'||e.name=='SecurityError')return adS(camBlocked()||window.top!==window||performance.now()-t0<400?EMB:'Camera permission was denied. On iPhone: Settings > Safari > Camera, choose Ask or Allow, reload, then tap Start camera.');if(!['OverconstrainedError','ConstraintNotSatisfiedError','NotReadableError','TypeError'].includes(e.name))return adS('Camera unavailable ('+e.name+'). Manual scoring still works.')}}
+if(!CS)return adS('No usable camera found or it is in use by another app. Manual scoring still works.');
+vd.muted=true;vd.srcObject=CS;await vd.play().catch(()=>{});const t=CS.getVideoTracks()[0];t.onended=()=>{adS('Camera stream interrupted. Tap Start camera. Your match is unaffected.');camHalt()};try{WL=await navigator.wakeLock.request('screen')}catch(e){}
+await new Promise(r=>vd.videoWidth?r():vd.onloadedmetadata=r);PH=Math.round(PW*vd.videoHeight/vd.videoWidth);pc.width=vo.width=PW;pc.height=vo.height=PH;const st=t.getSettings();$('#a1').textContent='Restart camera';calStart();adS(`Camera ${st.width}\u00d7${st.height}. Calibrate: ${CM[0]}`);clearInterval(tmr);tmr=setInterval(tick,80)}
+vd.onresize=()=>{if(CS&&vd.videoWidth){PH=Math.round(PW*vd.videoHeight/vd.videoWidth);pc.width=vo.width=PW;pc.height=vo.height=PH;GR=PG=BL=null;calStart();adS('Camera orientation changed. Recalibrate: '+CM[0])}};
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&CS&&CS.getVideoTracks()[0].readyState=='ended'){adS('Camera was interrupted. Tap Start camera.');camHalt()}});
+function calStart(){CALP=[];CALOK=false;calOn=true;CH=Hi=null;AST='cal';RI=null;drawOv()}
+vo.addEventListener('pointerup',e=>{if(!calOn)return;const r=vo.getBoundingClientRect();CALP.push([(e.clientX-r.left)/r.width*PW,(e.clientY-r.top)/r.height*PH]);
+if(CALP.length==4){CH=homog(CALPTS,CALP);Hi=CH&&hinv(CH);if(!Hi){CALP=[];CH=null;adS('Those points do not form a valid board plane. Try again: '+CM[0]);return drawOv()}}
+if(CALP.length==5){const[bx,by]=hap(Hi,...CALP[4]);CQ=Math.hypot(bx,by);calOn=false;CALOK=CQ<=5;const dm=Math.hypot(...hap(CH,B.dout,0).map((v,i)=>v-hap(CH,-B.dout,0)[i])),mpp=2*B.dout/dm;
+if(CALOK){RI=[];for(let y=0;y<PH;y++)for(let x=0;x<PW;x++){const[a,b]=hap(Hi,x,y);if(Math.hypot(a,b)<=B.dout+25)RI.push(y*PW+x)}RI=Uint32Array.from(RI);PG=BL=null;RB=1;stab=0;AST='wait'}
+adS(`Calibration check: bull off by ${CQ.toFixed(1)} mm, ≈${mpp.toFixed(2)} mm per pixel (processing resolution).${CALOK?'':' Too inaccurate: tap Calibrate and redo.'}${mpp>AD.mpp?' Board is small in the frame: move closer.':''}${CALOK?' Calibrated. Waiting for a still scene to capture the baseline.':''}`)}else adS('Calibrate '+CM[CALP.length]);drawOv()});
+function drawOv(){const c=vo.getContext('2d');c.clearRect(0,0,PW,PH);c.lineWidth=1.5;CALP.forEach(([x,y],i)=>{c.strokeStyle=i<4?'#ff2d9a':'#34e08a';c.beginPath();c.arc(x,y,7,0,7);c.stroke()});
+if(CH){c.strokeStyle='#34e08a';[B.bi,B.bo,B.ti,B.to,B.di,B.dout].forEach(r=>{c.beginPath();for(let a=0;a<=72;a++){const t=a*Math.PI/36,[x,y]=hap(CH,Math.sin(t)*r,Math.cos(t)*r);a?c.lineTo(x,y):c.moveTo(x,y)}c.stroke()});
+c.strokeStyle='#2d8cffaa';for(let i=0;i<20;i++){const t=(i*18-9)*Math.PI/180,[x1,y1]=hap(CH,Math.sin(t)*B.bo,Math.cos(t)*B.bo),[x2,y2]=hap(CH,Math.sin(t)*B.dout,Math.cos(t)*B.dout);c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke()}
+const[tx,ty]=hap(CH,0,B.dout+14);c.fillStyle='#fff';c.font='bold 20px system-ui';c.fillText('20',tx-10,ty+7)}
+if(DET){c.strokeStyle='#ffb12d';c.lineWidth=2.5;c.beginPath();c.arc(DET.px,DET.py,10,0,7);c.stroke()}}
+function tick(){if((!CS&&!VF)||!CALOK||!RI||vd.readyState<2||AST=='cal'||AST=='confirm'||AST=='blocked')return;
+if(!G||G.over){adS('Start a match to score with the camera.');return}
+if(PL>0&&G.visit.length==0)RB=1;PL=G.visit.length;
+pcx.drawImage(vd,0,0,PW,PH);const d=pcx.getImageData(0,0,PW,PH).data,n=PW*PH,g=GR||(GR=new Uint8Array(n));for(let i=0,j=0;j<n;j++,i+=4)g[j]=(d[i]*77+d[i+1]*150+d[i+2]*29)>>8;
+if(!PG){PG=g.slice();return}
+let mo=0,ms=0,bs=0;for(let k=0;k<RI.length;k++){const i=RI[k];if(Math.abs(g[i]-PG[i])>22)mo++;ms+=g[i];if(BL)bs+=BL[i]}mo/=RI.length;PG.set(g);
+if(mo>AD.mot){stab=0;if(AST=='ready')AST='wait';adS('Motion detected, waiting for the scene to settle...');return}
+if(++stab<AD.stable)return;
+if(!BL||RB){BL=g.slice();RB=0;AST='ready';adS('Ready. Throw a dart.');return}
+if(AST!='wait')return;
+if(G.pend){RB=1;return}if(!canIn())return;
+const gain=ms/Math.max(1,bs),m=new Uint8Array(n);let cn=0;for(let k=0;k<RI.length;k++){const i=RI[k];if(Math.abs(g[i]-BL[i]*gain)>AD.thr){m[i]=1;cn++}}
+if(cn/RI.length>.3){AST='blocked';return adS('The scene changed a lot (camera moved or lighting changed). Press Calibrate or Re-baseline.')}
+const bl=blob(m,PW,PH);if(!bl){BL=g.slice();AST='ready';return adS('No dart found. If you threw one, press Confirm miss or enter it manually.')}
+const el=bl.len/Math.max(1,bl.wid),t=tipOf(bl,Hi),z=zone(t.b[0],t.b[1],AD.u),calC=Math.max(0,1-CQ/6),detC=Math.min(1,el/6)*Math.min(1,bl.n/40),ok=el>=AD.minElong&&bl.n>=25&&calC>.2;
+DET={px:t.p[0],py:t.p[1],x:t.b[0],y:t.b[1],z,calC,detC,id:++DID};SG=g.slice();drawOv();
+if(ok&&AM!='c'&&!z.amb&&(z.seg>0||AM=='a')){camRecord(DET);BL=SG;AST='ready';return}
+showCfm(ok)}
+function camRecord(D){if(!canIn()){toast('Game busy: enter this dart manually','#ff4d6d');return}const h=hit(D.x,D.y);SRC='cam';record(h.seg,h.m,D.x,D.y,0);SRC='m'}
+function showCfm(ok){if(VF)vd.pause();AST='confirm';const D=DET,z=D.z,k=vd.videoWidth/PW,c=$('#cc').getContext('2d');try{c.drawImage(vd,D.px*k-80*k,D.py*k-60*k,160*k,120*k,0,0,160,120)}catch(e){}c.strokeStyle='#ffb12d';c.lineWidth=2;c.beginPath();c.arc(80,60,9,0,7);c.stroke();
+$('#apr').textContent=`${lbl({seg:z.seg,m:z.m,miss:!z.seg})} · ${z.seg*z.m}${z.amb?' · near a wire':''}${ok?'':' · weak detection'}`;$('#acf').hidden=0;$('#ad').classList.remove('mini');
+adS(`Confirm: tip ≈(${D.x.toFixed(0)}, ${D.y.toFixed(0)}) mm. Heuristic scores (not probabilities): calibration ${D.calC*100|0}/100, detection ${D.detC*100|0}/100.`)}
+function cfm(a){if(VF)vd.play();const D=DET;$('#acf').hidden=1;if(a==1)camRecord(D);else if(a==3)miss();else if(a==2)toast('Tap the correct field or use the keypad','#fff');BL=SG;AST='ready';stab=0;DET=null;drawOv()}
+$('#vf').onchange=async e=>{const f=e.target.files[0];if(!f)return;camHalt();VF=1;vd.src=URL.createObjectURL(f);vd.muted=true;vd.loop=false;
+try{await new Promise((r,j)=>{vd.onloadedmetadata=r;vd.onerror=j})}catch(x){VF=0;return adS('That video could not be opened.')}
+PH=Math.round(PW*vd.videoHeight/vd.videoWidth);pc.width=vo.width=PW;pc.height=vo.height=PH;GR=PG=BL=null;vd.currentTime=0;calStart();adS('Video loaded (paused). Calibrate on this frame: '+CM[0]+' Then press play. The video stays on this device.');clearInterval(tmr);tmr=setInterval(tick,80);e.target.value=''};
+vd.onended=()=>{if(VF)adS('Video finished.')};
+function vp(){if(VF)vd.paused?vd.play():vd.pause()}
+$('#am').onchange=()=>{AM=$('#am').value;try{localStorage.setItem('dartscope-am',AM)}catch(e){}};$('#cb').onclick=camOpen;
+/* ===== Finish assistant UI: route text + strong highlight on the board ===== */
+let FA=1,FI=0,FK='',RS=[],HLon=false,HL=null;const HLC=document.createElement('canvas');try{FA=localStorage.getItem('dartscope-fa')=='0'?0:1}catch(e){}
+function hlDraw(ts){const S=1024,x=HLC.getContext('2d'),h=S/2,k=h/B.face,A=i=>(i*18-99)*Math.PI/180;HLC.width=HLC.height=S;
+if(ts.length){const wd=(i,r0,r1)=>{const a0=A(i),a1=a0+Math.PI/10;x.moveTo(h+Math.cos(a0)*r1*k,h+Math.sin(a0)*r1*k);x.arc(h,h,r1*k,a0,a1);x.arc(h,h,r0*k,a1,a0,true);x.closePath()},
+rg=t=>{const i=ORDER.indexOf(t.n);if(t.n==25){if(t.m==2){x.moveTo(h+B.bi*k,h);x.arc(h,h,B.bi*k,0,7)}else{x.moveTo(h+B.bo*k,h);x.arc(h,h,B.bo*k,0,7);x.moveTo(h+B.bi*k,h);x.arc(h,h,B.bi*k,0,7,true)}}else if(t.m==3)wd(i,B.ti,B.to);else if(t.m==2)wd(i,B.di,B.dout);else{wd(i,B.bo,B.ti);wd(i,B.to,B.di)}};
+x.fillStyle='rgba(3,5,16,.6)';x.beginPath();x.arc(h,h,h,0,7);x.fill();x.globalCompositeOperation='destination-out';x.beginPath();ts.forEach(rg);x.fill();x.globalCompositeOperation='source-over';
+ts.forEach(t=>{x.save();x.beginPath();rg(t);x.shadowColor=t.c;x.shadowBlur=28;x.fillStyle=t.c+'aa';x.fill();x.lineWidth=3.2*k;x.strokeStyle='#fff';x.stroke();x.restore()});
+const cnt={};ts.forEach(t=>{const j=cnt[t.n]=(cnt[t.n]||0);cnt[t.n]++;const a=((t.n==25?-45:ORDER.indexOf(t.n)*18)+j*8)*Math.PI/180,r1=Math.min(t.n==25?B.bo:t.m==3?B.to:t.m==2?B.dout:B.di,B.dout),px=h+Math.sin(a)*218*k,py=h-Math.cos(a)*218*k;
+x.strokeStyle=t.c;x.lineWidth=2*k;x.beginPath();x.moveTo(h+Math.sin(a)*r1*k,h-Math.cos(a)*r1*k);x.lineTo(px,py);x.stroke();x.fillStyle=t.c;x.beginPath();x.arc(px,py,9*k,0,7);x.fill();x.fillStyle='#000';x.font='bold '+13*k+'px system-ui';x.textAlign='center';x.textBaseline='middle';x.fillText(t.i,px,py+k)})}
+if(HL)HL.material.map.needsUpdate=true}
+function assist(g,p,left){const el=$('#chk');let ts=[],h='',alt=false;
+if(!g.over&&!g.pend&&left>0){const key=p.score+'/'+left+'/'+p.entered;if(FK!=key){FK=key;FI=0}
+if(!p.entered){alt=true;ts=g.cfg.inR==1?[{n:20,m:2},{n:16,m:2}]:[{n:20,m:2},{n:20,m:3}];h='<b>Get in: '+ts.map(dn).join(' / ')+'</b>'}
+else{RS=routesN(p.score,left,g.cfg.outR,3);if(RS.length){FI%=RS.length;ts=RS[FI];h='<b>Finish: '+ts.map(dn).join(' → ')+'</b>'+(RS.length>1?'<small> · route '+(FI+1)+'/'+RS.length+' (tap)</small>':'')}
+else{const s=setupR(p.score,left,g.cfg.outR);if(s){ts=[s.d];h='<b>Setup: '+dn(s.d)+'</b><small> leaves '+s.r+', then '+s.nr.map(dn).join(' ')+(s.nx?' next visit':'')+'</small>'}else h='<b>No finish from '+p.score+'</b>'}}}
+el.innerHTML=h;el.hidden=!h;
+const ct=FA?ts.map((d,i)=>({n:d.n,m:d.m,i:alt?'•':i+1,c:['#ffd54a','#34e08a','#ff5ac8'][alt?0:i]})):[];HLon=ct.length>0&&!AN;hlDraw(HLon?ct:[]);if(HL)HL.visible=HLon;if(two)d2()}
+$('#hb').onclick=()=>{FA=FA?0:1;try{localStorage.setItem('dartscope-fa',FA)}catch(e){}$('#hb').classList.toggle('on',!!FA);if(G)ui()};$('#hb').classList.toggle('on',!!FA);
+$('#chk').onclick=()=>{if(RS.length>1){FI=(FI+1)%RS.length;if(G)ui()}};
+/* ===== 3D scene ===== */
+let R,SC,CAM,face,wall,tilt=false,D=800;const RC=new THREE.Raycaster(),D3=[],anim=[],fx=[],wob=[],cv=$('#cv'),RM=matchMedia('(prefers-reduced-motion:reduce)').matches;let shake=0;
+function tex(){const S=2048,c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d'),h=S/2,k=h/B.face,A=i=>(i*18-99)*Math.PI/180;
+x.fillStyle='#0b0b0d';x.beginPath();x.arc(h,h,h,0,7);x.fill();
+const ring=(r0,r1,f)=>{for(let i=0;i<20;i++){x.fillStyle=f(i);x.beginPath();x.arc(h,h,r1*k,A(i),A(i)+Math.PI/10);x.arc(h,h,r0*k,A(i)+Math.PI/10,A(i),true);x.fill()}};
+const bl=i=>i%2?'#e9dcb4':'#151515',rd=i=>i%2?'#1f9d55':'#d6213a';
+ring(B.bo,B.ti,bl);ring(B.ti,B.to,rd);ring(B.to,B.di,bl);ring(B.di,B.dout,rd);
+x.fillStyle='#1f9d55';x.beginPath();x.arc(h,h,B.bo*k,0,7);x.fill();x.fillStyle='#d6213a';x.beginPath();x.arc(h,h,B.bi*k,0,7);x.fill();
+x.strokeStyle='rgba(120,125,140,.55)';x.lineWidth=k*.55;[B.bi,B.bo,B.ti,B.to,B.di,B.dout].forEach(r=>{x.beginPath();x.arc(h,h,r*k,0,7);x.stroke()});
+for(let i=0;i<20;i++){const a=A(i);x.beginPath();x.moveTo(h+Math.cos(a)*B.bo*k,h+Math.sin(a)*B.bo*k);x.lineTo(h+Math.cos(a)*B.dout*k,h+Math.sin(a)*B.dout*k);x.stroke()}
+x.fillStyle='#fff';x.font='bold '+(27*k)+'px system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';
+ORDER.forEach((n,i)=>{const t=i*Math.PI/10;x.fillText(n,h+Math.sin(t)*198*k,h-Math.cos(t)*198*k)});
+x.globalAlpha=.05;for(let i=0;i<80000;i++){x.fillStyle=Math.random()<.5?'#000':'#fff';x.fillRect(Math.random()*S,Math.random()*S,2,2)}x.globalAlpha=1;return c}
+function init3(){try{R=new THREE.WebGLRenderer({canvas:cv,antialias:true})}catch(e){BC=tex();setTwo(1);$('#md').disabled=true;new ResizeObserver(fit).observe($('#bw'));return}
+R.setPixelRatio(Math.min(devicePixelRatio,2));R.outputEncoding=THREE.sRGBEncoding;SC=new THREE.Scene();CAM=new THREE.PerspectiveCamera(36,1,50,3000);
+const t=new THREE.CanvasTexture(BC=tex());t.encoding=THREE.sRGBEncoding;t.anisotropy=R.capabilities.getMaxAnisotropy();
+face=new THREE.Mesh(new THREE.CircleGeometry(B.face,96),new THREE.MeshStandardMaterial({map:t,roughness:.95,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
+const body=new THREE.Mesh(new THREE.CylinderGeometry(B.face+3,B.face+3,40,64).rotateX(Math.PI/2),new THREE.MeshStandardMaterial({color:0x08080a}));body.position.z=-21;
+const rim=new THREE.Mesh(new THREE.TorusGeometry(B.face+4,7,12,96),new THREE.MeshStandardMaterial({color:0x0a0a0c,roughness:.6}));
+wall=new THREE.Mesh(new THREE.PlaneGeometry(1500,1500),new THREE.MeshBasicMaterial({map:wallTex()}));wall.position.z=B.wall;
+SC.add(face,body,rim,wall,new THREE.AmbientLight(0xffffff,.56));const L=new THREE.DirectionalLight(0xffffff,.4);L.position.set(120,260,600);SC.add(L);
+const rl=new THREE.PointLight(0xff2d9a,.12);rl.position.set(-400,300,200);SC.add(rl);
+const wm=new THREE.MeshStandardMaterial({color:0xcfd4de,metalness:.6,roughness:.35,emissive:0x2a2e38});
+[B.bi,B.bo,B.ti,B.to,B.di,B.dout].forEach(r=>{const m=new THREE.Mesh(new THREE.TorusGeometry(r,.55,6,r<20?40:180),wm);m.position.z=.4;SC.add(m)});
+for(let i=0;i<20;i++){const a=(i*18-9)*Math.PI/180,l=B.dout-B.bo,r=(B.dout+B.bo)/2,m=new THREE.Mesh(new THREE.BoxGeometry(.9,l,1),wm);m.position.set(Math.sin(a)*r,Math.cos(a)*r,.4);m.rotation.z=-a;SC.add(m)}
+HM=new THREE.Mesh(new THREE.CircleGeometry(B.face,96),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(HC),transparent:true,opacity:0,depthWrite:false}));HM.position.z=.8;HM.visible=false;SC.add(HM);HL=new THREE.Mesh(new THREE.CircleGeometry(B.face,96),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(HLC),transparent:true,opacity:.9,depthWrite:false}));HL.position.z=1.1;HL.visible=false;SC.add(HL);
+new ResizeObserver(fit).observe($('#bw'));loop()}
+function fit(){d2();if(!R)return;const w=$('#bw').clientWidth,h=$('#bw').clientHeight;if(!w||!h)return;R.setSize(w,h,false);CAM.aspect=w/h;CAM.updateProjectionMatrix();D=752/Math.min(1,CAM.aspect)}
+$('#tl').onclick=function(){tilt=!tilt;this.setAttribute('aria-pressed',tilt);this.classList.toggle('on',tilt)};
+function mkDart(col){const g=new THREE.Group(),M=(c,m)=>new THREE.MeshStandardMaterial({color:c,metalness:m,roughness:.3,side:2}),
+cy=(a,b,l,z,mt)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(a,b,l,12).rotateX(Math.PI/2),mt);m.position.z=z;g.add(m)};
+cy(2.2,.5,22,11,M(0xdfe3ea,.9));cy(4.4,4.4,48,46,M(0xb8bcc6,.9));cy(2,2,36,88,M(0x222233,.2));
+const f=M(col,0);[new THREE.PlaneGeometry(34,26).rotateY(Math.PI/2),new THREE.PlaneGeometry(26,34).rotateX(Math.PI/2)].forEach(p=>{const m=new THREE.Mesh(p,f);m.position.z=114;g.add(m)});g.scale.setScalar(1.5);return g}
+function sync(fly){d2();if(!SC)return;while(D3.length>G.visit.length)SC.remove(D3.pop());
+while(D3.length<G.visit.length){const i=D3.length,d=G.visit[i],m=mkDart(G.players[G.cur].c),x=d.x,y=d.y,z=Math.hypot(x,y)>B.face?B.wall-4:-4;
+m.userData={x,y,z,rx:(Math.random()-.5)*.5,ry:(Math.random()-.5)*.5,t0:performance.now(),fly:fly&&i==G.visit.length-1};
+m.position.set(x,y,z);m.rotation.set(m.userData.rx,m.userData.ry,0);if(m.userData.fly)anim.push(m);SC.add(m);D3.push(m)}}
+function pulse(u,c){const m=new THREE.Mesh(new THREE.RingGeometry(5,7,32),new THREE.MeshBasicMaterial({color:c,transparent:true}));m.position.set(u.x,u.y,u.z+5);m.userData={t0:performance.now()};SC.add(m);fx.push(m)}
+function loop(){requestAnimationFrame(loop);if($('#g').hidden||document.hidden)return;const now=performance.now();if(AN){const p=Math.min(1,(now-AT)/1100);HP=1-Math.pow(1-p,3);if(HM){HM.material.opacity=HP*.92;HM.scale.setScalar(.92+.08*HP)}if(two&&(p<1||AN==1)){d2();if(p>=1)AN=2}}if(two)return;if(HL&&HL.visible)HL.material.opacity=.72+.28*Math.sin(now*.006);
+for(let i=anim.length-1;i>=0;i--){const m=anim[i],u=m.userData,t=Math.min(1,(now-u.t0)/450),e=t*t;
+m.position.set(u.x*.5+(u.x-u.x*.5)*e,u.y*.5-200+(u.y*.5+200)*e+Math.sin(Math.PI*t)*80,u.z+Math.min(560,Math.max(120,CAM.position.z*.8))*(1-e));m.rotation.set(u.rx+(1-e)*.7,u.ry,(1-e)*14);
+if(t>=1){anim.splice(i,1);pulse(u,G?G.players[G.cur].c:'#fff');u.t1=now;wob.push(m);if(!RM)shake=1}}
+for(let i=wob.length-1;i>=0;i--){const m=wob[i],u=m.userData,t=(now-u.t1)/500;if(t>=1){wob.splice(i,1);m.rotation.set(u.rx,u.ry,0);m.position.z=u.z}else{const d=Math.sin(t*38)*(1-t)*(1-t);m.rotation.set(u.rx+d*.1,u.ry+d*.06,0);m.position.z=u.z-d*1.5}}
+for(let i=fx.length-1;i>=0;i--){const m=fx[i],t=(now-m.userData.t0)/600;if(t>=1){SC.remove(m);fx.splice(i,1)}else{m.scale.setScalar(1+t*4);m.material.opacity=1-t}}
+const tp=tilt?new THREE.Vector3(FX,FY-D*.45/ZT,D*.88/ZT):new THREE.Vector3(FX,FY,D/ZT);shake*=.9;CAM.position.lerp(tp,.12);CAM.position.y+=Math.sin(now*.045)*shake*2.5;(LK||(LK=new THREE.Vector3())).lerp(new THREE.Vector3(FX,FY,0),.12);CAM.lookAt(LK);R.render(SC,CAM)}
+cv.addEventListener('pointerup',e=>{if(DG){DG=0;return}if(!R||(!AN&&!canIn()&&!PK))return;const r=cv.getBoundingClientRect();
+RC.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1),CAM);
+const h=RC.intersectObjects([face,wall])[0];if(!h)return;const{x,y}=h.point,o=h.object===wall?{seg:0,m:0}:hit(x,y);if(PK)return zTo(x,y);if(AN)return segInfo(o);record(o.seg,o.m,x,y,0)});
+/* ===== Boot ===== */
+init3();try{const s=localStorage.getItem(K);if(s){G=JSON.parse(s);if(G&&G.players)names=G.players.map(p=>p.n);else G=null}if(G)try{H=JSON.parse(localStorage.getItem('dartscope-h')||'[]')}catch(e){H=[]}}catch(e){G=null}
+try{const c=JSON.parse(localStorage.getItem('dartscope-cfg')||'null');if(c&&c.C&&Array.isArray(c.names)&&c.names.length){C=c.C;if(!G)names=c.names}}catch(e){}
+sm(1);sv();$('#s').hidden=false;
+</script></body></html>
